@@ -100,10 +100,10 @@ public final class HtmlRendererUtils
     /**
      * Utility to set the submitted value of the provided component from the
      * data in the current request object.
-     * <p/>
+     * <p>
      * Param component is required to be an EditableValueHolder. On return
      * from this method, the component's submittedValue property will be
-     * set if the submitted form contained that component.
+     * set if the submitted form contained that component.</p>
      */
     public static void decodeUIInput(FacesContext facesContext, UIComponent component)
     {
@@ -832,7 +832,6 @@ public final class HtmlRendererUtils
      * property is "", the attribute is rendered.
      * 
      * @param writer
-     * @param component
      * @param componentProperty
      * @param htmlAttrName
      * @return
@@ -1542,18 +1541,18 @@ public final class HtmlRendererUtils
     /**
      * Get the name of the request parameter that holds the id of the
      * link-type component that caused the form to be submitted.
-     * <p/>
+     * <p>
      * Within each page there may be multiple "link" type components that
      * cause page submission. On the server it is necessary to know which
      * of these actually caused the submit, in order to invoke the correct
      * listeners. Such components therefore store their id into the
      * "hidden command link field" in their associated form before
      * submitting it.
-     * <p/>
+     * </p><p>
      * The field is always a direct child of each form, and has the same
      * <i>name</i> in each form. The id of the form component is therefore
      * both necessary and sufficient to determine the full name of the
-     * field.
+     * field.</p>
      */
     public static String getHiddenCommandLinkFieldName(FormInfo formInfo)
     {
@@ -2134,7 +2133,7 @@ public final class HtmlRendererUtils
      * @param children
      * @param skipNullValue
      * @param skipUnrendered
-     * @return ArrayList size > 0 if any parameter found
+     * @return ArrayList size &gt; 0 if any parameter found
      */
     public static List<UIParameter> getValidUIParameterChildren(
             FacesContext facesContext, List<UIComponent> children,
@@ -2159,7 +2158,7 @@ public final class HtmlRendererUtils
      * @param skipUnrendered should UIParameters with isRendered() returning false be skipped
      * @param skipNullName   should UIParameters with a null name be skipped
      *                       (normally true, but in the case of h:outputFormat false)
-     * @return ArrayList size > 0 if any parameter found 
+     * @return ArrayList size &gt; 0 if any parameter found 
      */
     public static List<UIParameter> getValidUIParameterChildren(
             FacesContext facesContext, List<UIComponent> children,
