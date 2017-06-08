@@ -64,7 +64,6 @@ public class CDIUtils
         return dao;
 
     }
-
     public static boolean isSessionScopeActive(BeanManager beanManager)
     {
         try 
