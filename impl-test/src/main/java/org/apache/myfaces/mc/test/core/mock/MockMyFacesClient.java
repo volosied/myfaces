@@ -122,7 +122,6 @@ public class MockMyFacesClient
      * later on client.apply method.
      * 
      * @param component
-     * @throws Exception
      */
     public void submit(UIComponent component)
     {

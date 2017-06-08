@@ -138,7 +138,6 @@ public abstract class AbstractMyFacesTestCase
     /**
      * <p>Construct a new instance of this test case.</p>
      *
-     * @param name Name of this test case
      */    
     public AbstractMyFacesTestCase()
     {
@@ -464,7 +463,6 @@ public abstract class AbstractMyFacesTestCase
      * Execute restore view phase.
      * 
      * @param facesContext
-     * @throws Exception
      */
     public void restoreView(FacesContext facesContext)
     {
@@ -478,7 +476,6 @@ public abstract class AbstractMyFacesTestCase
      * flags are set, it returns without do any action.
      * 
      * @param facesContext
-     * @throws Exception
      */
     public void applyRequestValues(FacesContext facesContext)
     {
@@ -496,7 +493,6 @@ public abstract class AbstractMyFacesTestCase
      * flags are set, it returns without do any action.
      * 
      * @param facesContext
-     * @throws Exception
      */
     public void processValidations(FacesContext facesContext)
     {
@@ -514,7 +510,6 @@ public abstract class AbstractMyFacesTestCase
      * flags are set, it returns without do any action.
      * 
      * @param facesContext
-     * @throws Exception
      */
     public void updateModelValues(FacesContext facesContext)
     {
@@ -533,7 +528,6 @@ public abstract class AbstractMyFacesTestCase
      * flags are set, it returns without do any action.
      * 
      * @param facesContext
-     * @throws Exception
      */
     public void invokeApplication(FacesContext facesContext)
     {
@@ -1107,7 +1101,6 @@ public abstract class AbstractMyFacesTestCase
      * 
      * @param facesContext
      * @param phase
-     * @throws Exception
      */
     protected void executePhase(FacesContext facesContext, PhaseId phase)
     {
