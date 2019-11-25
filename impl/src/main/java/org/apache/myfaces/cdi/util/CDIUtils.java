@@ -85,6 +85,14 @@ public class CDIUtils
         return (Bean<T>) beanManager.resolve(beans);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> Bean<T> get(BeanManager beanManager, Type type, Annotation... qualifiers)
+    {
+        Set<Bean<?>> beans = beanManager.getBeans(type, qualifiers);
+
+        return (Bean<T>) beanManager.resolve(beans);
+    }
+
     public static <T> T get(BeanManager beanManager, Class<T> beanClass, 
             boolean create, Annotation... qualifiers)
     {
@@ -92,6 +100,20 @@ public class CDIUtils
         {
             Bean<T> bean = get(beanManager, beanClass, qualifiers);
             return (bean != null) ? get(beanManager, bean, beanClass, create) : null;
+        }
+        catch (ContextNotActiveException e)
+        {
+            return null;
+        }
+    }
+
+    public static <T> T get(BeanManager beanManager, Type type, 
+            boolean create, Annotation... qualifiers)
+    {
+        try
+        {
+            Bean<T> bean = get(beanManager, type, qualifiers);
+            return (bean != null) ? get(beanManager, bean, type, create) : null;
         }
         catch (ContextNotActiveException e)
         {
