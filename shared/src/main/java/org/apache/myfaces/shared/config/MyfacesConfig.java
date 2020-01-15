@@ -293,15 +293,6 @@ public class MyfacesConfig
     public final static boolean INIT_PARAM_WRAP_SCRIPT_CONTENT_WITH_XML_COMMENT_TAG_DEFAULT = false;
     
     /**
-     * If set true, render the form submit script inline, as in myfaces core 1.2 and earlier versions 
-     */
-    @JSFWebConfigParam(since="2.0.2", expectedValues="true, false, on, off, yes, no", defaultValue="false", 
-            ignoreUpperLowerCase=true, group="render")
-    public final static String INIT_PARAM_RENDER_FORM_SUBMIT_SCRIPT_INLINE = 
-        "org.apache.myfaces.RENDER_FORM_SUBMIT_SCRIPT_INLINE";
-    public final static boolean INIT_PARAM_RENDER_FORM_SUBMIT_SCRIPT_INLINE_DEFAULT = false;
-    
-    /**
      * Enable/disable DebugPhaseListener feature, with provide useful information about ValueHolder 
      * variables (submittedValue, localValue, value).
      * Note evaluate those getters for each component could cause some unwanted side effects when 
@@ -588,7 +579,6 @@ public class MyfacesConfig
     private boolean refreshTransientBuildOnPSSPreserveState;
     private boolean _validateXML;
     private boolean _wrapScriptContentWithXmlCommentTag;
-    private boolean _renderFormSubmitScriptInline;
     private boolean _debugPhaseListenerEnabled;
     private boolean _strictJsf2RefreshTargetAjax;
     private boolean _strictJsf2CCELResolver;
@@ -702,7 +692,6 @@ public class MyfacesConfig
         //The default is true but we'll let it false because it depends if 
         //tomahawk is on classpath and no test environment is set
         setCheckExtensionsFilter(false);
-        setRenderFormSubmitScriptInline(INIT_PARAM_RENDER_FORM_SUBMIT_SCRIPT_INLINE_DEFAULT);
         setDebugPhaseListenerEnabled(INIT_PARAM_DEBUG_PHASE_LISTENER_DEFAULT);
         setStrictJsf2RefreshTargetAjax(INIT_PARAM_STRICT_JSF_2_REFRESH_TARGET_AJAX_DEFAULT);
         setStrictJsf2CCELResolver(INIT_PARAM_STRICT_JSF_2_CC_EL_RESOLVER_DEFAULT);
@@ -757,9 +746,6 @@ public class MyfacesConfig
                                                                    INIT_PARAM_RENDER_VIEWSTATE_ID_DEFAULT));
         myfacesConfig.setStrictXhtmlLinks(getBooleanInitParameter(extCtx, INIT_PARAM_STRICT_XHTML_LINKS,
                                                                   INIT_PARAM_STRICT_XHTML_LINKS_DEFAULT));
-        myfacesConfig.setRenderFormSubmitScriptInline(getBooleanInitParameter(extCtx,
-                                                                  INIT_PARAM_RENDER_FORM_SUBMIT_SCRIPT_INLINE,
-                                                                  INIT_PARAM_RENDER_FORM_SUBMIT_SCRIPT_INLINE_DEFAULT));
         
         myfacesConfig.setConfigRefreshPeriod(getLongInitParameter(extCtx, INIT_PARAM_CONFIG_REFRESH_PERIOD,
                 INIT_PARAM_CONFIG_REFRESH_PERIOD_DEFAULT));
@@ -1348,17 +1334,6 @@ public class MyfacesConfig
             boolean wrapScriptContentWithXmlCommentTag)
     {
         this._wrapScriptContentWithXmlCommentTag = wrapScriptContentWithXmlCommentTag;
-    }
-
-    public boolean isRenderFormSubmitScriptInline()
-    {
-        return _renderFormSubmitScriptInline;
-    }
-
-    public void setRenderFormSubmitScriptInline(
-            boolean renderFormSubmitScriptInline)
-    {
-        _renderFormSubmitScriptInline = renderFormSubmitScriptInline;
     }
 
     public boolean isDebugPhaseListenerEnabled()
