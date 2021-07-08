@@ -113,6 +113,11 @@ public class HtmlResponseStateManager extends MyfacesResponseStateManager
         String serializedState = getStateCache(facesContext).getStateTokenProcessor(facesContext)
                 .encode(facesContext, savedState);
 
+        if (log.isLoggable(Level.FINE)) 
+        {
+             log.fine("Writing serialized viewstate string with hashCode : " + serializedState.hashCode());
+        }
+
         responseWriter.startElement(HTML.INPUT_ELEM, null);
         responseWriter.writeAttribute(HTML.TYPE_ATTR, HTML.INPUT_TYPE_HIDDEN, null);
         responseWriter.writeAttribute(HTML.NAME_ATTR, ResponseStateManager.VIEW_STATE_PARAM, null);
