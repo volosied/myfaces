@@ -187,8 +187,10 @@
                 <!-- SITE GENERATION -->
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.4</version>
+                    <version>3.1.1</version>
                     <configuration>
+                        <source>8</source>
+                        <additionalJOption>-Xdoclint:none</additionalJOption>
                         <tags>
                             <tag>
                                 <name>JSFJspTag</name>
