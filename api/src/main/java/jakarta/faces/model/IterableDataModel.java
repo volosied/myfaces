@@ -152,8 +152,7 @@ public class IterableDataModel<E> extends DataModel<E>
         else
         {
             _iterable = (Iterable<E>)data;
-            _rowIndex = -1;
-            setRowIndex(0);
+            
             if (data instanceof Set)
             {
                 _count = ((Set)data).size();
@@ -172,8 +171,22 @@ public class IterableDataModel<E> extends DataModel<E>
             }
             else 
             {
-                _count = -1;
+                // int count = 0;
+                if (_list == null)
+                {
+                    _list = new ArrayList<>();
+                }
+                Iterator<E> iterator = _iterable.iterator();
+                while (iterator.hasNext())
+                {
+                    _list.add(iterator.next());
+                    // count++;
+                }  
+                _count = _list.size();
             }
+
+            _rowIndex = -1;
+            setRowIndex(0);
         }
     }
 }
