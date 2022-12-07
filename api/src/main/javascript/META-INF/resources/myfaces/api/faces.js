@@ -471,6 +471,12 @@ if (!myfaces.ab) {
     myfaces.ab = function(source, event, eventName, execute, render, options) {
         if (!options) {
             options = {};
+        } else {
+            var params = {};
+            for(prop in options){
+                params[prop] = options[prop];
+            }
+            options["params"] = params;
         }
 
         if (eventName) {
