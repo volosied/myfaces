@@ -20,8 +20,10 @@ package org.apache.myfaces.resource;
 
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.MappingMatch;
 
-import org.apache.myfaces.application.FacesServletMapping;
+// import org.apache.myfaces.application.FacesServletMapping;
 import org.apache.myfaces.application.FacesServletMappingUtils;
 import org.apache.myfaces.config.webparameters.MyfacesConfig;
 
@@ -64,18 +66,18 @@ public class BaseResourceHandlerSupport extends ResourceHandlerSupport
     @Override
     public String calculateResourceBasePath(FacesContext facesContext)
     {        
-        FacesServletMapping mapping = FacesServletMappingUtils.getCurrentRequestFacesServletMapping(facesContext);
+        HttpServletMapping mapping = FacesServletMappingUtils.getCurrentRequestFacesHTTPServletMapping(facesContext);
         ExternalContext externalContext = facesContext.getExternalContext();      
         
         if (mapping != null)
         {
             String resourceBasePath = null;
-            if (mapping.isExactMapping())
+            if (mapping.getMappingMatch() == MappingMatch.EXACT)
             {
                 // this method is actually only used to determine if the current request is a resource request
                 // as the resource can never be a exact mapping, lets ignore it
             }
-            else if (mapping.isExtensionMapping())
+            else if (mapping.getMappingMatch() == MappingMatch.EXTENSION)
             {
                 // Mapping using a suffix. In this case we have to strip 
                 // the suffix. If we have a url like:

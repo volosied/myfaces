@@ -41,6 +41,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.render.ResponseStateManager;
 import jakarta.faces.view.ViewDeclarationLanguage;
 import jakarta.faces.view.facelets.Facelet;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.MappingMatch;
 
 /**
  * A ViewHandlerSupport implementation for use with standard Java Servlet engines,
@@ -122,15 +124,15 @@ public class ViewIdSupport
 
         if (viewId == null)
         {
-            FacesServletMapping mapping = FacesServletMappingUtils.getCurrentRequestFacesServletMapping(context);
-            if (mapping == null || mapping.isExtensionMapping())
+            HttpServletMapping mapping = FacesServletMappingUtils.getCurrentRequestFacesHTTPServletMapping(context);
+            if (mapping == null || mapping.getMappingMatch() == MappingMatch.EXTENSION)
             {
                 viewId = handleSuffixMapping(context, rawViewId);
             }
-            else if (mapping.isExactMapping())
+            else if (mapping.getMappingMatch() == MappingMatch.EXACT)
             {
                 // if the current request is a exact mapping and the viewId equals the exact viewId
-                if (rawViewId.equals(mapping.getExact()))
+                if (rawViewId.equals(mapping.getPattern()))
                 {
                     viewId = handleSuffixMapping(context, rawViewId + ".jsf");
                 }
@@ -140,16 +142,16 @@ public class ViewIdSupport
                     viewId = rawViewId;
                 }
             }
-            else if (mapping.isPrefixMapping())
+            else if (mapping.getMappingMatch() == MappingMatch.PATH)
             {
-                viewId = handlePrefixMapping(rawViewId, mapping.getPrefix());
+                viewId = handlePrefixMapping(rawViewId, mapping.getPattern().replace("/*", ""));
 
                 // A viewId that is equals to the prefix mapping on servlet mode is
                 // considered invalid, because jsp vdl will use RequestDispatcher and cause
                 // a loop that ends in a exception. Note in portlet mode the view
                 // could be encoded as a query param, so the viewId could be valid.
                 if (viewId != null
-                        && viewId.equals(mapping.getPrefix())
+                        && viewId.equals(mapping.getPattern().replace("/*", ""))
                         && !ExternalContextUtils.isPortlet(context.getExternalContext()))
                 {
                     throw new InvalidViewIdException();
@@ -158,12 +160,12 @@ public class ViewIdSupport
                 // In Faces 2.3 some changes were done in the VDL to avoid the jsp vdl
                 // RequestDispatcher redirection (only accept viewIds with jsp extension).
                 // If we have this case
-                if (viewId != null && viewId.equals(mapping.getPrefix()))
+                if (viewId != null && viewId.equals(mapping.getPattern().replace("/*", "")))
                 {
                     viewId = handleSuffixMapping(context, viewId + ".jsf");
                 }
             }
-            else if (mapping.getUrlPattern().startsWith(rawViewId))
+            else if (mapping.getPattern().startsWith(rawViewId))
             {
                 throw new InvalidViewIdException(rawViewId);
             }
@@ -198,7 +200,7 @@ public class ViewIdSupport
             throw new IllegalArgumentException("ViewId must start with a '/': " + viewId);
         }
 
-        FacesServletMapping mapping = FacesServletMappingUtils.getCurrentRequestFacesServletMapping(context);
+        HttpServletMapping mapping = FacesServletMappingUtils.getCurrentRequestFacesHTTPServletMapping(context);
         ExternalContext externalContext = context.getExternalContext();
         String contextPath = externalContext.getRequestContextPath();
         StringBuilder builder = SharedStringBuilder.get(context, VIEW_HANDLER_SUPPORT_SB);
@@ -212,13 +214,13 @@ public class ViewIdSupport
         // In Faces 2.3 we could have cases where the viewId can be bound to an url-pattern that is not
         // prefix or suffix, but exact mapping. In this part we need to take the viewId and check if
         // the viewId is bound or not with a mapping.
-        if (mapping != null && mapping.isExactMapping())
+        if (mapping != null && mapping.getMappingMatch() == MappingMatch.EXACT)
         {
             String exactMappingViewId = calculateExactMapping(context, viewId);
             if (exactMappingViewId != null && !exactMappingViewId.isEmpty())
             {
                 // if the current exactMapping already matches the requested viewId -> same view, skip....
-                if (!mapping.getExact().equals(exactMappingViewId))
+                if (!mapping.getPattern().equals(exactMappingViewId))
                 {
                     // different viewId -> lets try to lookup a exact mapping
                     mapping = FacesServletMappingUtils.getExactMapping(context, exactMappingViewId);
@@ -227,7 +229,7 @@ public class ViewIdSupport
                     // we need a to search for a prefix or extension mapping
                     if (mapping == null)
                     {
-                        mapping = FacesServletMappingUtils.getGenericPrefixOrSuffixMapping(context);
+                        mapping = FacesServletMappingUtils.getGenericPrefixOrSuffixHTTPMapping(context);
                         if (mapping == null)
                         {
                             throw new IllegalStateException(
@@ -241,11 +243,11 @@ public class ViewIdSupport
 
         if (mapping != null)
         {
-            if (mapping.isExactMapping())
+            if (mapping.getMappingMatch() == MappingMatch.EXACT)
             {
-                builder.append(mapping.getExact());
+                builder.append(mapping.getPattern());
             }
-            else if (mapping.isExtensionMapping())
+            else if (mapping.getMappingMatch() == MappingMatch.EXTENSION)
             {
                 //See Faces 2.0 section 7.5.2 
                 boolean founded = false;
@@ -254,7 +256,7 @@ public class ViewIdSupport
                     if (viewId.endsWith(contextSuffix))
                     {
                         builder.append(viewId.substring(0, viewId.indexOf(contextSuffix)));
-                        builder.append(mapping.getExtension());
+                        builder.append(mapping.getPattern().replace("*", ""));
                         founded = true;
                         break;
                     }
@@ -272,7 +274,7 @@ public class ViewIdSupport
                     // for usability. There is a potential risk that change the mapping in a webapp make 
                     // the same application fail,
                     // so use viewIds ending with mapping extensions is not a good practice.
-                    if (viewId.endsWith(mapping.getExtension()))
+                    if (viewId.endsWith(mapping.getPattern()))
                     {
                         builder.append(viewId);
                     }
@@ -288,9 +290,9 @@ public class ViewIdSupport
                     }
                 }
             }
-            else if (mapping.isPrefixMapping())
+            else if (mapping.getMappingMatch() == MappingMatch.PATH)
             {
-                builder.append(mapping.getPrefix());
+                builder.append(mapping.getPattern().replace("/*", ""));
                 builder.append(viewId);
             }
         }

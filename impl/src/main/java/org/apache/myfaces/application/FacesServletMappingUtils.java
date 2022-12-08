@@ -383,7 +383,7 @@ public class FacesServletMappingUtils
         }
     }
     
-    public static FacesServletMapping getExactMapping(FacesContext facesContext, String prefixedExactMappingViewId)
+    public static HttpServletMapping getExactMapping(FacesContext facesContext, String prefixedExactMappingViewId)
     {
         if (!ExternalContextUtils.isPortlet(facesContext.getExternalContext()))
         {
@@ -398,7 +398,31 @@ public class FacesServletMappingUtils
                     {
                         if (!mapping.contains("*") && prefixedExactMappingViewId.equals(mapping))
                         {
-                            return FacesServletMapping.createExactMapping(prefixedExactMappingViewId);
+                            // return FacesServletMapping.createExactMapping(prefixedExactMappingViewId); //VS
+                            return new HttpServletMapping() 
+                            {
+                                @Override
+                                public String getServletName()
+                                {
+                                    return "";
+                                }
+                                @Override
+                                public String getPattern()
+                                {
+                                    return prefixedExactMappingViewId;
+                                }
+                                @Override
+                                public String getMatchValue()
+                                {
+                                    return null;
+                                }
+                                @Override
+                                public MappingMatch getMappingMatch()
+                                {
+                                    return MappingMatch.EXACT;
+                                }
+                                
+                            };
                         }
                     }
                 }
