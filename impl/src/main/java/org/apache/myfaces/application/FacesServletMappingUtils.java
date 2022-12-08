@@ -291,9 +291,9 @@ public class FacesServletMappingUtils
                                 {
                                     mapping = mapping.substring(0, mapping.length()-2);
                                 }                                
-                                if (mapping.equals(servletPath))
+                                if (mapping.equals(servletPath))  // Matching means exact
                                 {
-                                    return FacesServletMapping.createPrefixMapping(mapping);
+                                    return FacesServletMapping.createExactMapping(mapping);
                                 }
                             }
                        }
