@@ -28,6 +28,9 @@ import java.util.Map;
 import jakarta.faces.application.ProjectStage;
 import jakarta.faces.application.Resource;
 import jakarta.faces.context.FacesContext;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.MappingMatch;
+
 import org.apache.myfaces.application.FacesServletMapping;
 import org.apache.myfaces.application.FacesServletMappingUtils;
 import org.apache.myfaces.config.webparameters.MyfacesConfig;
@@ -114,23 +117,25 @@ public class ResourceImpl extends Resource implements ContractResource
         if (_requestPath == null)
         {
             FacesContext context = FacesContext.getCurrentInstance();
-            FacesServletMapping mapping = FacesServletMappingUtils.getCurrentRequestFacesServletMapping(context);
-            if (mapping.isExactMapping())
+            HttpServletMapping httpMaps = FacesServletMappingUtils.getCurrentRequestFacesHTTPServletMapping(context);
+            FacesServletMapping mapping;
+            // FacesServletMapping mapping = FacesServletMappingUtils.getCurrentRequestFacesServletMapping(context);
+            if (httpMaps.getMappingMatch() == MappingMatch.EXACT)
             {
                 // resources can't be exact, lets fallback to a generic one
-                mapping = FacesServletMappingUtils.getGenericPrefixOrSuffixMapping(context);
+                httpMaps = FacesServletMappingUtils.getGenericPrefixOrSuffixHTTPMapping(context);
             }
             
             String path = "";
-            if (mapping.isExtensionMapping())
+            if (httpMaps.getMappingMatch() == MappingMatch.EXTENSION)
             {
                 path = _resourceHandlerSupport.getResourceIdentifier() + '/' + 
-                    getResourceName() + mapping.getExtension();
+                    getResourceName() + httpMaps.getPattern().replace("*", "");
             }
-            else
+            else if (httpMaps.getMappingMatch() == MappingMatch.PATH)
             {
                 path = _resourceHandlerSupport.getResourceIdentifier() + '/' + getResourceName();
-                path = (mapping.getPrefix() == null) ? path : mapping.getPrefix() + path;
+                path = (httpMaps.getPattern() == null) ? path : httpMaps.getPattern().replace("/*", "") + path;
             }
 
             String metadata = null;

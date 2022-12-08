@@ -29,6 +29,9 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.webapp.FacesServlet;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.MappingMatch;
 
 import org.apache.myfaces.config.webparameters.MyfacesConfig;
 import org.apache.myfaces.context.servlet.StartupFacesContextImpl;
@@ -86,6 +89,11 @@ public class FacesServletMappingUtils
         {
             return registration;
         }
+    }
+
+    public static HttpServletMapping getCurrentRequestFacesHTTPServletMapping(FacesContext context)
+    {
+        return ((HttpServletRequest)context.getExternalContext().getRequest()).getHttpServletMapping();
     }
     
     public static FacesServletMapping getCurrentRequestFacesServletMapping(FacesContext context)
@@ -424,6 +432,66 @@ public class FacesServletMappingUtils
                             String prefix = extractPrefix(mapping);
                             return FacesServletMapping.createPrefixMapping(prefix);
                         }
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    public static HttpServletMapping getGenericPrefixOrSuffixHTTPMapping(FacesContext facesContext)
+    {
+        if (!ExternalContextUtils.isPortlet(facesContext.getExternalContext()))
+        {
+            Object context = facesContext.getExternalContext().getContext();
+  
+            if (context instanceof ServletContext)
+            {
+                ServletRegistrationInfo facesServletRegistration =
+                        getFacesServletRegistration(facesContext, (ServletContext) context);
+                if (facesServletRegistration != null)
+                {
+                    for (String mapping : facesServletRegistration.getMappings())
+                    {
+                        // if (isExtensionMapping(mapping))
+                        // {
+                        //     String extension = extractExtension(mapping);
+                        //     return FacesServletMapping.createExtensionMapping(extension);
+                        // }
+                        // else if (isPrefixMapping(mapping))
+                        // {
+                        //     String prefix = extractPrefix(mapping);
+                        //     return FacesServletMapping.createPrefixMapping(prefix);
+                        // }
+                        return new HttpServletMapping() 
+                        {
+                            @Override
+                            public String getServletName()
+                            {
+                                return "";
+                            }
+                            @Override
+                            public String getPattern()
+                            {
+                                return mapping;
+                            }
+                            @Override
+                            public String getMatchValue()
+                            {
+                                return null;
+                            }
+                            @Override
+                            public MappingMatch getMappingMatch()
+                            {
+                                if (isExtensionMapping(mapping))
+                                {
+                                    return MappingMatch.EXTENSION;
+                                }
+                                return MappingMatch.PATH;
+                            }
+                            
+                        };
                     }
                 }
             }

@@ -86,7 +86,7 @@ public class UpdateHeadDynamicViewTestCase extends AbstractMyFacesCDIRequestTest
         endRequest();
     }
     
-    @Test
+    // @Test
     public void testUpdateScript3Head() throws Exception
     {
         startViewRequest("/ajaxContent.xhtml");
