@@ -101,6 +101,8 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
     
     private ViewIdSupport viewIdSupport;
 
+    public final String START_FLOW_TRANSITION = "START_FLOW_TRANSITION";
+
     public NavigationHandlerImpl()
     {
         if (log.isLoggable(Level.FINEST))
@@ -367,6 +369,13 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
     
     private void applyFlowTransition(FacesContext facesContext, NavigationContext navigationContext)
     {
+
+        if(facesContext.getAttributes().containsKey(START_FLOW_TRANSITION))
+        {
+            facesContext.getAttributes().remove(START_FLOW_TRANSITION);
+            System.out.println("SKIPPING APPLY FLOW TRANSITION");
+            return;
+        }
         //Apply Flow transition if any
         // Is any flow transition on the way?
         if (navigationContext != null
@@ -627,12 +636,17 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                         // Since we start a new flow, the current flow is now the
                         // target flow.
                         navigationContext.pushFlow(facesContext, targetFlow);
-                        currentFlow = targetFlow;
-                        //No outboundCallNode.
-                        //Resolve start node.
-                        outcomeToGo = resolveStartNodeOutcome(targetFlow);
+
                         checkFlowNode = true;
                         startFlow = false;
+                        //Resolve start node.
+                        outcomeToGo = resolveStartNodeOutcome(targetFlow);
+                        if(currentFlow == null){
+                            System.out.println("CREATING FLOW");
+                            flowHandler.transition(facesContext, currentFlow, targetFlow, null, outcomeToGo);
+                            facesContext.getAttributes().put(START_FLOW_TRANSITION, true);
+                        }
+                        currentFlow = targetFlow;
                     }
                     if (checkFlowNode)
                     {
