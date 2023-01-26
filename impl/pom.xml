@@ -78,6 +78,7 @@
                         <exclude>src/main/resources/META-INF/licenses/*-LICENSE.txt</exclude>
                         <exclude>src/main/resources/META-INF/licenses/*-LICENSE.TXT</exclude>
                         <exclude>src/main/resources/META-INF/services/**</exclude>
+                        <exclude>.vscode/**</exclude>
 
                         <!-- The xsd files are CDDL+GLP:
                           Category B: Reciprocal Licenses
@@ -106,6 +107,7 @@
                         org/apache/myfaces/push/WebsocketComponent.java,
                         org/apache/myfaces/push/WebsocketInit.java,
                         org/apache/myfaces/taglib/core/*,
+                        org/apache/myfaces/application/*,
                         org/apache/myfaces/taglib/html/*,
                         org/apache/myfaces/view/facelets/component/JsfElement.java,
                         org/apache/myfaces/webapp/WebConfigParamsLogger.java</excludes>
