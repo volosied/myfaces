@@ -536,7 +536,6 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
             boolean checkFlowNode = false;
             String outcomeToGo = outcome;
             String actionToGo = fromAction;
-            
             if (currentFlow != null)
             {
                 // Faces 2.2 section 7.4.2: When inside a flow, a view identifier has 
@@ -604,7 +603,6 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
             {
                 boolean complete = false;
                 boolean checkNavCase = true;
-
                 while (!complete && (startFlow || checkFlowNode))
                 {
                     if (startFlow)
@@ -636,12 +634,12 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                         // Since we start a new flow, the current flow is now the
                         // target flow.
                         navigationContext.pushFlow(facesContext, targetFlow);
-
                         checkFlowNode = true;
                         startFlow = false;
                         //Resolve start node.
                         outcomeToGo = resolveStartNodeOutcome(targetFlow);
-                        if(currentFlow == null){
+                        if(currentFlow == null)
+                        {
                             System.out.println("CREATING FLOW");
                             flowHandler.transition(facesContext, currentFlow, targetFlow, null, outcomeToGo);
                             facesContext.getAttributes().put(START_FLOW_TRANSITION, true);
@@ -758,8 +756,7 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                             }
                             else
                             {
-                                //Should not happen
-                                complete = true;
+                                complete = true; //Should not happen
                             }
                         }
                         else if (checkNavCase)
@@ -771,8 +768,7 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                                     flowNavigationStructure, actionToGo, outcomeToGo, viewId);
                             
                             // Faces 2.2 section 7.4.2 "... any text that references a view identifier, such as 
-                            // <from-view-id> or <to-view-id>,
-                            // can also refer to a flow node ..."
+                            // <from-view-id> or <to-view-id>, can also refer to a flow node ..."
                             if (navigationCase != null)
                             {
                                 outcomeToGo = navigationCase.getToViewId(facesContext);
@@ -790,8 +786,7 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                         }
                     }
                 }
-                // Apply implicit navigation rules over outcomeToGo
-                if (outcomeToGo != null && navigationCase == null)
+                if (outcomeToGo != null && navigationCase == null) // Apply implicit navigation rules over outcomeToGo
                 {
                     navigationCase = getOutcomeNavigationCase (facesContext, actionToGo, outcomeToGo);
                 }
@@ -818,8 +813,7 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
         {
             navigationContext.setNavigationCase(navigationCase);
         }
-        return navigationContext.getNavigationCase();
-        // if navigationCase == null, will stay on current view
+        return navigationContext.getNavigationCase(); // if navigationCase == null, will stay on current view
     }
 
     private String resolveStartNodeOutcome(Flow targetFlow)
