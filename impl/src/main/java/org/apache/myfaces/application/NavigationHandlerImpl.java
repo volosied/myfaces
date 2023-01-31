@@ -101,6 +101,7 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
     
     private ViewIdSupport viewIdSupport;
 
+    // Flow Transition Marker so that we don't enter the flow more than needed.
     public final String STARTED_FLOW_TRANSITION = "STARTED_FLOW_TRANSITION";
 
     public NavigationHandlerImpl()
@@ -366,25 +367,16 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
             }
         }
     }
-
-    private Boolean didFlowTransitionAlready(FacesContext facesContext){
-        if(facesContext.getAttributes().containsKey(STARTED_FLOW_TRANSITION) 
-                    && ((Boolean)facesContext.getAttributes().get(STARTED_FLOW_TRANSITION)))
-        {
-            return true;
-        }
-        return false;
-    }
     
     private void applyFlowTransition(FacesContext facesContext, NavigationContext navigationContext)
     {
 
-        if(didFlowTransitionAlready(facesContext))
+        if(facesContext.getAttributes().containsKey(STARTED_FLOW_TRANSITION))
         {
             facesContext.getAttributes().remove(STARTED_FLOW_TRANSITION);
-            System.out.println("SKIPPING APPLY FLOW TRANSITION");
             return;
         }
+
         //Apply Flow transition if any
         // Is any flow transition on the way?
         if (navigationContext != null
@@ -398,8 +390,6 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
             {
                 Flow sourceFlow = navigationContext.getSourceFlows().get(i);
                 Flow targetFlow = navigationContext.getTargetFlows().get(i);
-
-                System.out.println("Applying Transition");
 
                 flowHandler.transition(facesContext, sourceFlow, targetFlow, 
                     navigationContext.getFlowCallNodes().get(i), 
@@ -661,6 +651,12 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                         if (flowNode != null)
                         {
                             checkNavCase = true;
+                            /*
+                             * Spec says View, Switch, Method Flow, and Return should be checked in this order
+                             * However, this causes problems for us since a switch or method node could reference
+                             * FlowScope objects and the CDI context for the FlowScope isn't created yet. 
+                             * Reorganization / Refactoring was needed -- See MYFACES-4553.
+                             */
                             if (!complete && flowNode instanceof ViewNode)
                             {
                                 ViewNode viewNode = (ViewNode) flowNode;
@@ -721,21 +717,14 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                             }
                             if(!complete && flowHandler.getCurrentFlow() == null)
                             {
-                                System.out.println("dEBUG: CREATING FLOW");
                                 flowHandler.transition(facesContext, null, targetFlow, null, outcomeToGo);
-                                // entering new flow, so we should transition again
                                 facesContext.getAttributes().put(STARTED_FLOW_TRANSITION, true);
-                                // flowStarted = false;
+                                // since we just transitioned, we also need to mark it in the nav context
+                                // because if we encounter a flow node next then the STARTED_FLOW_TRANSITION is marked false
+                                // During the transition in applyFlowTransition we will need to skip that first flow
                                 navigationContext.transitionedEarly(true);
-                                // should we getViewId again? 
                                 continue;
                             }
-                            // if(!complete && flowHandler.getCurrentFlow() == null && !(flowNode instanceof ReturnNode))
-                            // {
-                            //     System.out.println("CREATING FLOW");
-                            //     flowHandler.transition(facesContext, null, targetFlow, (FlowCallNode) flowNode, outcomeToGo);
-                            //     facesContext.getAttributes().put(STARTED_FLOW_TRANSITION, true);
-                            // }
                             if (!complete && flowNode instanceof FlowCallNode)
                             {
                                 // "... If the node is a FlowCallNode, save it aside as facesFlowCallNode. ..."
@@ -747,10 +736,6 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                                     targetFlowCallNode = flowCallNode;
                                     facesContext.getAttributes().put(STARTED_FLOW_TRANSITION, false);
                                     startFlow = true;
-                                    // if(didFlowTransitionAlready(facesContext)){
-                                    //     facesContext.getAttributes().put(STARTED_FLOW_TRANSITION, false);
-                                    //     flowHandler.transition(facesContext, targetFlow, null, null, outcome);
-                                    // }
                                     continue;
                                 }
                                 else
@@ -778,10 +763,6 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                                 {
                                     outcomeToGo = vdlViewIdentifier;
                                     actionToGo = currentFlow.getId();
-                                    // if(didFlowTransitionAlready(facesContext)){
-                                    //     facesContext.getAttributes().put(STARTED_FLOW_TRANSITION, false);
-                                    //     flowHandler.transition(facesContext, targetFlow, null, null, outcome);
-                                    // }
                                     continue;
                                 }
                                 else
@@ -829,11 +810,6 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
             if (startFlowId != null)
             {
                 navigationCase = new FlowNavigationCase(navigationCase, startFlowId, startFlowDocumentId);
-            } else {
-                // if(didFlowTransitionAlready(facesContext)){
-                //     facesContext.getAttributes().put(STARTED_FLOW_TRANSITION, false);
-                //     flowHandler.transition(facesContext, targetFlow, null, null, outcome);
-                // }
             }
         }
         if (outcome != null && navigationCase == null)
