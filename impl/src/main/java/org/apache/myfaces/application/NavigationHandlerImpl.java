@@ -392,10 +392,14 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                 || (navigationContext.getTargetFlows() != null && !navigationContext.getTargetFlows().isEmpty()))
         {
             FlowHandler flowHandler = facesContext.getApplication().getFlowHandler();
-            for (int i = 0; i < navigationContext.getTargetFlows().size(); i++)
+
+            
+            for (int i = navigationContext.transitionedEarly ? 1 : 0; i < navigationContext.getTargetFlows().size(); i++)
             {
                 Flow sourceFlow = navigationContext.getSourceFlows().get(i);
                 Flow targetFlow = navigationContext.getTargetFlows().get(i);
+
+                System.out.println("Applying Transition");
 
                 flowHandler.transition(facesContext, sourceFlow, targetFlow, 
                     navigationContext.getFlowCallNodes().get(i), 
@@ -721,7 +725,8 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
                                 flowHandler.transition(facesContext, null, targetFlow, null, outcomeToGo);
                                 // entering new flow, so we should transition again
                                 facesContext.getAttributes().put(STARTED_FLOW_TRANSITION, true);
-                                flowStarted = false;
+                                // flowStarted = false;
+                                navigationContext.transitionedEarly(true);
                                 // should we getViewId again? 
                                 continue;
                             }
@@ -1589,9 +1594,21 @@ public class NavigationHandlerImpl extends ConfigurableNavigationHandler
         private List<FlowCallNode> targetFlowCallNodes;
         private List<Flow> currentFlows;
         private int returnCount = 0;
-
+        private Boolean transitionedEarly = false;
+        
         public NavigationContext()
         {
+        }
+
+        public void transitionedEarly(Boolean transitionedEarly)
+        {
+            this.transitionedEarly = transitionedEarly;
+        }
+
+
+        public Boolean transitionedEarly()
+        {
+            return transitionedEarly;
         }
 
         public NavigationContext(NavigationCase navigationCase)
