@@ -45,6 +45,8 @@ public class ParamsNamingContainerResolver
     Map<String, String> delegate;
     FacesContext facesContext;
 
+    private static final String NAMESPACED_CONTAINER_ID = "org.apache.myfaces.NAMESPACED_CONTAINER_PREFIX";
+
     public ParamsNamingContainerResolver(FacesContext facesContext)
     {
         this.facesContext = facesContext;
@@ -90,6 +92,13 @@ public class ParamsNamingContainerResolver
         //not yet present, we are in a postback phase, without a viewroot yet present
         if(viewRoot == null)
         {
+
+            String key = (String) facesContext.getAttributes().get(NAMESPACED_CONTAINER_ID);
+            if(key != null)
+            {
+                return key;
+            }
+            
             Map<String, String> reqParamMap = facesContext.getExternalContext().getRequestParameterMap();
 
             //no prefix, we have a blank ViewState in the request!
@@ -101,15 +110,18 @@ public class ParamsNamingContainerResolver
             // it is static per request!
 
             //we have a prefixed viewstate
-            String firstViewStateKey = reqParamMap.keySet().stream()
+            key = reqParamMap.keySet().stream()
                     .filter(item -> item.contains(ResponseStateManager.VIEW_STATE_PARAM))
                     .findFirst().orElse("");
-            if(firstViewStateKey.length() > 0)
+            if(key.length() > 0)
             {
                 char sep = facesContext.getNamingContainerSeparatorChar();
-                return firstViewStateKey.split(String.valueOf(sep))[0] + sep;
+                key = key.split(String.valueOf(sep))[0] + sep;
             }
-            return firstViewStateKey;
+
+            facesContext.getAttributes().put(NAMESPACED_CONTAINER_ID, key);
+
+            return key;
         }
         if(viewRoot instanceof NamingContainer)
         {
