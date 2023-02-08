@@ -81,7 +81,7 @@ public class UISelectOne extends UIInput
         String group = getGroup();
         String submittedValue = (String) getSubmittedValue();
 
-        if (group != null && !group.isEmpty()) 
+        if (group != null && !group.isEmpty() && isEmpty(submittedValue) ) 
         {
             final UIComponent form = getRadioNestingForm(context, this);
 
@@ -95,7 +95,7 @@ public class UISelectOne extends UIInput
                     {
                         // check if the is empty (see ) or if it's not valid (means this path has been taken already)
                         // See conditions listed under spec: uiselectone#processValidators
-                        if(isEmpty(submittedValue) && isSubmittedAlready(target)){
+                        if(isSubmittedAlready(target)){
                             previouslySubmittedOrValidated = true;
                             return VisitResult.COMPLETE;
                         }          
@@ -103,15 +103,16 @@ public class UISelectOne extends UIInput
                     return VisitResult.ACCEPT;
                 }
             });
+
+            if(previouslySubmittedOrValidated){
+                // Skip further validation due to either 
+                // 1) one of the submissions are not valid (for instance, required, but none submitted (see jakarta/faces#329))
+                // 2) submitted value has been found and validated
+                return;
+            }
+            
         }
 
-        if(previouslySubmittedOrValidated){
-            // Skip further validation due to either 
-            // 1) one of the submissions are not valid (for instance, required, but none submitted (see jakarta/faces#329))
-            // 2) submitted value has been found and validated
-            return;
-        }
-        
         super.processValidators(context);
     }
 
