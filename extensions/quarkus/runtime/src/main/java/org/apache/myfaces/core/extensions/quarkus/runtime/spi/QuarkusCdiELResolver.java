@@ -18,8 +18,6 @@
  */
 package org.apache.myfaces.core.extensions.quarkus.runtime.spi;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -52,12 +50,6 @@ public class QuarkusCdiELResolver extends ELResolver
 
     @Override
     public Class<?> getCommonPropertyType(ELContext arg0, Object arg1)
-    {
-        return null;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1)
     {
         return null;
     }

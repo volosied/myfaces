@@ -116,9 +116,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-servlet-api</artifactId>
-            <version>${tomcat.version}</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${servlet.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -252,6 +252,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
+        <servlet.version>6.0.0</servlet.version>
         <tomcat.version>10.1.5</tomcat.version>
         <arquillian-drone.version>3.0.0-alpha.7</arquillian-drone.version>
     </properties>
