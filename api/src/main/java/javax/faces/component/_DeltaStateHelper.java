@@ -383,6 +383,10 @@ class _DeltaStateHelper implements StateHelper, TransientStateHelper, TransientS
     @Override
     public Object put(Serializable key, Object value)
     {
+
+        if(key.equals(UIViewRoot.PropertyKeys.uniqueIdCounter)){
+            System.out.println("PropertyKeys.uniqueIdCounter " + value);
+        }
         Object returnValue = null;
         if (_createDeltas(key))
         {
@@ -745,6 +749,7 @@ class _DeltaStateHelper implements StateHelper, TransientStateHelper, TransientS
     @Override
     public void restoreState(FacesContext context, Object state)
     {
+        System.out.println("DELTA RESTORE!");
         if (state == null)
         {
             return;
@@ -765,7 +770,9 @@ class _DeltaStateHelper implements StateHelper, TransientStateHelper, TransientS
         {
             Serializable key = (Serializable) serializedState[cnt];
             Object savedValue = UIComponentBase.restoreAttachedState(context, serializedState[cnt + 1]);
-
+                                if(key.equals(UIViewRoot.PropertyKeys.uniqueIdCounter)){
+                                    System.out.println("PropertyKeys.uniqueIdCounter " + savedValue);
+                                }
             if (isInitialStateMarked())
             {
                 if (savedValue instanceof InternalDeltaListMap)

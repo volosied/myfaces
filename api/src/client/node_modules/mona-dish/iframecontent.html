@@ -1,0 +1,35 @@
+<html>
+<head>
+    <script type="systemjs-importmap">
+{
+  "imports": {
+    "mona-dish": "./dist/js/system/index.js"
+  }
+}
+  </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.7.1/system.min.js"></script>
+
+    <button onClick="sendMessage();">Send to page</button>
+
+</head>
+<body>
+<div class="msg">hello from angular 8 portlet</div>
+<script type="text/javascript">
+    Promise.all([System.import('mona-dish')]).then(([monadish]) => {
+
+        const {Broker, Message, Direction} = monadish;
+
+        window.broker = new Broker();
+        broker.registerListener("portletEvt", (msg) => {
+            console.log("received");
+            let message = msg.message;
+            document.querySelector(".msg").innerHTML = message;
+        });
+
+        window.sendMessage = function () {
+            broker.broadcast("pageMessage", new Message("hello from iframe"), Direction.UP);
+        };
+    });
+</script>
+</body>
+</html>

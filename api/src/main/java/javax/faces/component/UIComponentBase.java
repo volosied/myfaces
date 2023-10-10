@@ -2061,6 +2061,7 @@ public abstract class UIComponentBase extends UIComponent
     @SuppressWarnings("unchecked")
     public void restoreState(FacesContext context, Object state)
     {
+        System.out.println("UIComponentBase RESTORE STATE!");
         if (context == null)
         {
             throw new NullPointerException ("context");

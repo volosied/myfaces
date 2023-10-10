@@ -1,0 +1,36 @@
+<html>
+<head>
+    <script type="systemjs-importmap">
+{
+  "imports": {
+    "monadish": "../../../dist/js/system/index.js"
+  }
+}
+  </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.7.1/system.min.js"></script>
+
+    <div id="holder">
+
+    </div>
+
+</head>
+<body>
+<div class="msg">hello from angular 8 portlet</div>
+<script type="text/javascript">
+    Promise.all([System.import('monadish')]).then(([monadish]) => {
+
+        const {DomQuery} = monadish;
+
+        let holder = DomQuery.byId("holder");
+        let attachShadow = holder.attachShadow();
+
+        attachShadow.allElems()[0].innerHTML = "<div id='inner' class='inner'>hello from inner</div>"
+
+        console.log("id found", holder.byId("inner").length == 1);
+        console.log("shadow id found", attachShadow.byId("inner").length == 1);
+        console.log("shadow id found from outside with deep", DomQuery.byId("inner", true).length == 1);
+        console.log("deep shadow id found", DomQuery.byId(document).querySelectorAll("#holder /shadow/ .inner").length == 1);
+    });
+</script>
+</body>
+</html>

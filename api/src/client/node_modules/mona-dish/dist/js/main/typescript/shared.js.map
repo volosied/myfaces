@@ -1,0 +1,1 @@
+{"version":3,"file":"shared.js","sourceRoot":"./src/main/typescript/","sources":["main/typescript/shared.ts"],"names":[],"mappings":";;;AAAA;;GAEG;AACU,QAAA,GAAG,GAAS,CAAC,WAAW,IAAI,OAAO,UAAU,CAAC,CAAC,CAAC,CAAC,UAAU,CAAA,CAAC;IAClE,CAAC,WAAW,IAAI,OAAO,MAAM,CAAC,CAAC,CAAC,CAAC,MAAM,CAAC,CAAC;QACzC,CAAC,WAAW,IAAI,OAAO,MAAM,CAAC,CAAC,CAAC,CAAC,MAAM,CAAC,CAAC;YACrC,IAAI,CAAC"}
