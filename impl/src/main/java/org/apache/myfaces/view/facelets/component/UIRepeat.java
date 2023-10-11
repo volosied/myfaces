@@ -20,7 +20,6 @@ package org.apache.myfaces.view.facelets.component;
 
 import java.io.IOException;
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,10 +31,9 @@ import jakarta.el.ValueExpression;
 import jakarta.faces.FacesException;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.component.ContextCallback;
-import jakarta.faces.component.EditableValueHolder;
-import jakarta.faces.component.NamingContainer;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIComponentBase;
+import jakarta.faces.component.UIIterate;
 import jakarta.faces.component.visit.VisitCallback;
 import jakarta.faces.component.visit.VisitContext;
 import jakarta.faces.component.visit.VisitHint;
@@ -57,7 +55,6 @@ import jakarta.faces.render.Renderer;
 import org.apache.myfaces.buildtools.maven2.plugin.builder.annotation.JSFComponent;
 import org.apache.myfaces.buildtools.maven2.plugin.builder.annotation.JSFProperty;
 import org.apache.myfaces.cdi.model.FacesDataModelManager;
-import org.apache.myfaces.core.api.shared.EditableValueHolderState;
 import org.apache.myfaces.core.api.shared.lang.Assert;
 import org.apache.myfaces.core.api.shared.lang.SharedStringBuilder;
 import org.apache.myfaces.util.ExternalSpecifications;
@@ -68,7 +65,7 @@ import org.apache.myfaces.view.facelets.ViewPoolProcessor;
  *  
  */
 @JSFComponent(name="ui:repeat", defaultRendererType="facelets.ui.Repeat")
-public class UIRepeat extends UIComponentBase implements NamingContainer
+public class UIRepeat extends UIIterate
 {
     public static final String COMPONENT_TYPE = "facelets.ui.Repeat";
 
@@ -79,8 +76,6 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
     private final static DataModel<?> EMPTY_MODEL = new ListDataModel<Object>(Collections.emptyList());
     
     private static final Class<Object[]> OBJECT_ARRAY_CLASS = Object[].class;
-
-    private static final Object[] LEAF_NO_STATE = new Object[]{null,null};
     
     private Object _initialDescendantComponentState = null;
 
@@ -387,351 +382,6 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
     }
     
     /**
-     * Overwrite the state of the child components of this component with data previously saved by method
-     * saveDescendantComponentStates.
-     * <p>
-     * The saved state info only covers those fields that are expected to vary between rows of a table. 
-     * Other fields are not modified.
-     */
-    @SuppressWarnings("unchecked")
-    private void restoreDescendantComponentStates(UIComponent parent, boolean iterateFacets, Object state,
-                                                  boolean restoreChildFacets)
-    {
-        int descendantStateIndex = -1;
-        List<? extends Object[]> stateCollection = null;
-        
-        if (iterateFacets && parent.getFacetCount() > 0)
-        {
-            Iterator<UIComponent> childIterator = parent.getFacets().values().iterator();
-            
-            while (childIterator.hasNext())
-            {
-                UIComponent component = childIterator.next();
-
-                // reset the client id (see spec 3.1.6)
-                component.setId(component.getId());
-                if (!component.isTransient())
-                {
-                    if (descendantStateIndex == -1)
-                    {
-                        stateCollection = ((List<? extends Object[]>) state);
-                        descendantStateIndex = stateCollection.isEmpty() ? -1 : 0;
-                    }
-                    
-                    if (descendantStateIndex != -1 && descendantStateIndex < stateCollection.size())
-                    {
-                        Object[] object = stateCollection.get(descendantStateIndex);
-                        if (component instanceof EditableValueHolder)
-                        {
-                            EditableValueHolderState evhState = (EditableValueHolderState) object[0];
-                            if (evhState == null)
-                            {
-                                evhState = EditableValueHolderState.EMPTY;
-                            }
-                            evhState.restoreState((EditableValueHolder) component);
-                        }
-                        // If there is descendant state to restore, call it recursively, otherwise
-                        // it is safe to skip iteration.
-                        if (object[1] != null)
-                        {
-                            restoreDescendantComponentStates(component, restoreChildFacets, object[1], true);
-                        }
-                        else
-                        {
-                            restoreDescendantComponentWithoutRestoreState(component, restoreChildFacets, true);
-                        }
-                    }
-                    else
-                    {
-                        restoreDescendantComponentWithoutRestoreState(component, restoreChildFacets, true);
-                    }
-                    descendantStateIndex++;
-                }
-            }
-        }
-        
-        if (parent.getChildCount() > 0)
-        {
-            for (int i = 0; i < parent.getChildCount(); i++)
-            {
-                UIComponent component = parent.getChildren().get(i);
-
-                // reset the client id (see spec 3.1.6)
-                component.setId(component.getId());
-                if (!component.isTransient())
-                {
-                    if (descendantStateIndex == -1)
-                    {
-                        stateCollection = ((List<? extends Object[]>) state);
-                        descendantStateIndex = stateCollection.isEmpty() ? -1 : 0;
-                    }
-                    
-                    if (descendantStateIndex != -1 && descendantStateIndex < stateCollection.size())
-                    {
-                        Object[] object = stateCollection.get(descendantStateIndex);
-                        if (component instanceof EditableValueHolder)
-                        {
-                            EditableValueHolderState evhState = (EditableValueHolderState) object[0];
-                            if (evhState == null)
-                            {
-                                evhState = EditableValueHolderState.EMPTY;
-                            }
-                            evhState.restoreState((EditableValueHolder) component);
-                        }
-                        // If there is descendant state to restore, call it recursively, otherwise
-                        // it is safe to skip iteration.
-                        if (object[1] != null)
-                        {
-                            restoreDescendantComponentStates(component, restoreChildFacets, object[1], true);
-                        }
-                        else
-                        {
-                            restoreDescendantComponentWithoutRestoreState(component, restoreChildFacets, true);
-                        }
-                    }
-                    else
-                    {
-                        restoreDescendantComponentWithoutRestoreState(component, restoreChildFacets, true);
-                    }
-                    descendantStateIndex++;
-                }
-            }
-        }
-    }
-
-    /**
-     * Just call component.setId(component.getId()) to reset all client ids and 
-     * ensure they will be calculated for the current row, but do not waste time
-     * dealing with row state code.
-     * 
-     * @param parent
-     * @param iterateFacets
-     * @param restoreChildFacets 
-     */
-    private void restoreDescendantComponentWithoutRestoreState(UIComponent parent, boolean iterateFacets,
-                                                               boolean restoreChildFacets)
-    {
-        if (iterateFacets && parent.getFacetCount() > 0)
-        {
-            Iterator<UIComponent> childIterator = parent.getFacets().values().iterator();
-            
-            while (childIterator.hasNext())
-            {
-                UIComponent component = childIterator.next();
-
-                // reset the client id (see spec 3.1.6)
-                component.setId(component.getId());
-                if (!component.isTransient())
-                {
-                    restoreDescendantComponentWithoutRestoreState(component, restoreChildFacets, true);
-                }
-            }
-        }
-        
-        if (parent.getChildCount() > 0)
-        {
-            for (int i = 0; i < parent.getChildCount(); i++)
-            {
-                UIComponent component = parent.getChildren().get(i);
-
-                // reset the client id (see spec 3.1.6)
-                component.setId(component.getId());
-                if (!component.isTransient())
-                {
-                    restoreDescendantComponentWithoutRestoreState(component, restoreChildFacets, true);
-                }
-            }
-        }
-    }
-
-    /**
-     * Walk the tree of child components of this UIData, saving the parts of their state that can vary between rows.
-     * <p>
-     * This is very similar to the process that occurs for normal components when the view is serialized. Transient
-     * components are skipped (no state is saved for them).
-     * <p>
-     * If there are no children then null is returned. If there are one or more children, and all children are transient
-     * then an empty collection is returned; this will happen whenever a table contains only read-only components.
-     * <p>
-     * Otherwise a collection is returned which contains an object for every non-transient child component; that object
-     * may itself contain a collection of the state of that child's child components.
-     */
-    private Collection<Object[]> saveDescendantComponentStates(UIComponent parent, boolean iterateFacets,
-                                                               boolean saveChildFacets)
-    {
-        Collection<Object[]> childStates = null;
-        // Index to indicate how many components has been passed without state to save.
-        int childEmptyIndex = 0;
-        int totalChildCount = 0;
-                
-        if (iterateFacets && parent.getFacetCount() > 0)
-        {
-            Iterator<UIComponent> childIterator = parent.getFacets().values().iterator();
-
-            while (childIterator.hasNext())
-            {
-                UIComponent child = childIterator.next();
-                if (!child.isTransient())
-                {
-                    // Add an entry to the collection, being an array of two
-                    // elements. The first element is the state of the children
-                    // of this component; the second is the state of the current
-                    // child itself.
-
-                    if (child instanceof EditableValueHolder)
-                    {
-                        if (childStates == null)
-                        {
-                            childStates = new ArrayList<>(
-                                    parent.getFacetCount()
-                                    + parent.getChildCount()
-                                    - totalChildCount
-                                    + childEmptyIndex);
-                            for (int ci = 0; ci < childEmptyIndex; ci++)
-                            {
-                                childStates.add(LEAF_NO_STATE);
-                            }
-                        }
-                    
-                        childStates.add(child.getChildCount() > 0 ? 
-                                new Object[] { EditableValueHolderState.create((EditableValueHolder) child),
-                                    saveDescendantComponentStates(child, saveChildFacets, true)} :
-                                new Object[] { EditableValueHolderState.create((EditableValueHolder) child),
-                                    null});
-                    }
-                    else if (child.getChildCount() > 0 || (saveChildFacets && child.getFacetCount() > 0))
-                    {
-                        Object descendantSavedState = saveDescendantComponentStates(child, saveChildFacets, true);
-                        
-                        if (descendantSavedState == null)
-                        {
-                            if (childStates == null)
-                            {
-                                childEmptyIndex++;
-                            }
-                            else
-                            {
-                                childStates.add(LEAF_NO_STATE);
-                            }
-                        }
-                        else
-                        {
-                            if (childStates == null)
-                            {
-                                childStates = new ArrayList<>(
-                                        parent.getFacetCount()
-                                        + parent.getChildCount()
-                                        - totalChildCount
-                                        + childEmptyIndex);
-                                for (int ci = 0; ci < childEmptyIndex; ci++)
-                                {
-                                    childStates.add(LEAF_NO_STATE);
-                                }
-                            }
-                            childStates.add(new Object[]{null, descendantSavedState});
-                        }
-                    }
-                    else
-                    {
-                        if (childStates == null)
-                        {
-                            childEmptyIndex++;
-                        }
-                        else
-                        {
-                            childStates.add(LEAF_NO_STATE);
-                        }
-                    }
-                }
-                totalChildCount++;
-            }
-        }
-        
-        if (parent.getChildCount() > 0)
-        {
-            for (int i = 0; i < parent.getChildCount(); i++)
-            {
-                UIComponent child = parent.getChildren().get(i);
-                if (!child.isTransient())
-                {
-                    // Add an entry to the collection, being an array of two
-                    // elements. The first element is the state of the children
-                    // of this component; the second is the state of the current
-                    // child itself.
-
-                    if (child instanceof EditableValueHolder)
-                    {
-                        if (childStates == null)
-                        {
-                            childStates = new ArrayList<>(
-                                    parent.getFacetCount()
-                                    + parent.getChildCount()
-                                    - totalChildCount
-                                    + childEmptyIndex);
-                            for (int ci = 0; ci < childEmptyIndex; ci++)
-                            {
-                                childStates.add(LEAF_NO_STATE);
-                            }
-                        }
-                    
-                        childStates.add(child.getChildCount() > 0 ? 
-                                new Object[] { EditableValueHolderState.create((EditableValueHolder) child),
-                                    saveDescendantComponentStates(child, saveChildFacets, true)} :
-                                new Object[] { EditableValueHolderState.create((EditableValueHolder) child),
-                                    null});
-                    }
-                    else if (child.getChildCount() > 0 || (saveChildFacets && child.getFacetCount() > 0))
-                    {
-                        Object descendantSavedState = saveDescendantComponentStates(child, saveChildFacets, true);
-                        
-                        if (descendantSavedState == null)
-                        {
-                            if (childStates == null)
-                            {
-                                childEmptyIndex++;
-                            }
-                            else
-                            {
-                                childStates.add(LEAF_NO_STATE);
-                            }
-                        }
-                        else
-                        {
-                            if (childStates == null)
-                            {
-                                childStates = new ArrayList<>(
-                                        parent.getFacetCount()
-                                        + parent.getChildCount()
-                                        - totalChildCount
-                                        + childEmptyIndex);
-                                for (int ci = 0; ci < childEmptyIndex; ci++)
-                                {
-                                    childStates.add(LEAF_NO_STATE);
-                                }
-                            }
-                            childStates.add(new Object[]{null, descendantSavedState});
-                        }
-                    }
-                    else
-                    {
-                        if (childStates == null)
-                        {
-                            childEmptyIndex++;
-                        }
-                        else
-                        {
-                            childStates.add(LEAF_NO_STATE);
-                        }
-                    }
-                }
-                totalChildCount++;
-            }
-        }
-        
-        return childStates;
-    }
-    
-    /**
      * Returns the rowCount of the underlying DataModel.
      * @return
      */
@@ -757,10 +407,109 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
     
     public void setRowIndex(int index)
     {
-        _setIndex(index);
+        if (isRowStatePreserved())
+        {
+            _setIndexPreserveComponentState(index);
+        }
+        else
+        {
+            _setIndexWithoutPreserveComponentState(index);
+        }
     }
+
+     private void _setIndexPreserveComponentState(int index)
+     {
+        if (index < -1)
+        {
+            throw new IllegalArgumentException("rowIndex is less than -1");
+        }
+
+        if (_index == index)
+        {
+            return;
+        }
+
+        FacesContext facesContext = getFacesContext();
+
+        if (_initialDescendantFullComponentState != null)
+        {
+            //Just save the row
+            Map<String, Object> sm = saveFullDescendantComponentStates(facesContext, null,
+                                                                       getChildren().iterator(), false);
+            if (sm != null && !sm.isEmpty())
+            {
+                _rowDeltaStates.put(getContainerClientId(facesContext), sm);
+            }
+            if (index != -1)
+            {
+                _rowTransientStates.put(getContainerClientId(facesContext),
+                        saveTransientDescendantComponentStates(facesContext, null, getChildren().iterator(), false));
+            }
+        }
+
+        _index = index;
+        
+        DataModel<?> localModel = getDataModel();
+        localModel.setRowIndex(index);
+
+        if (_index != -1)
+        {
+            String var = getVar();
+            if (var != null && (_emptyModel || localModel.isRowAvailable()))
+            {
+                if (_emptyModel)
+                {
+                    getFacesContext().getExternalContext().getRequestMap().put(var, _index);
+                }
+                else
+                {
+                    getFacesContext().getExternalContext().getRequestMap().put(var, localModel.getRowData());
+                }
+            }
+            String varStatus = getVarStatus();
+            if (varStatus != null)
+            {
+                getFacesContext().getExternalContext().getRequestMap()
+                        .put(varStatus, _getRepeatStatus());
+            }
+        }
+
+        if (_initialDescendantFullComponentState != null)
+        {
+            Map<String, Object> rowState = _rowDeltaStates.get(getContainerClientId(facesContext));
+            if (rowState == null)
+            {
+                //Restore as original
+                restoreFullDescendantComponentStates(facesContext, getChildren().iterator(),
+                        _initialDescendantFullComponentState, false);
+            }
+            else
+            {
+                //Restore first original and then delta
+                restoreFullDescendantComponentDeltaStates(facesContext, getChildren().iterator(),
+                        rowState, _initialDescendantFullComponentState, false);
+            }
+            if (_index == -1)
+            {
+                restoreTransientDescendantComponentStates(facesContext, getChildren().iterator(), null, false);
+            }
+            else
+            {
+                rowState = _rowTransientStates.get(getContainerClientId(facesContext));
+                if (rowState == null)
+                {
+                    restoreTransientDescendantComponentStates(facesContext, getChildren().iterator(), null, false);
+                }
+                else
+                {
+                    restoreTransientDescendantComponentStates(facesContext, getChildren().iterator(), rowState, false);
+                }
+            }
+        }
+
+     }
     
-    private void _setIndex(int index)
+    private void _setIndexWithoutPreserveComponentState(int index)
     {
         if (index < -1)
         {
@@ -1014,7 +763,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
         
         // reset index
         _captureScopeValues();
-        _setIndex(-1);
+        setRowIndex(-1);
 
         try
         {
@@ -1046,7 +795,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
                 
                 _count = 0;
                 
-                _setIndex(i);
+                setRowIndex(i);
                 
                 while (((step > 0 && i <= end) || (step < 0 && i >= end)) && _isIndexAvailable())
                 {
@@ -1083,7 +832,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
                     
                     i += step;
                     
-                    _setIndex(i);
+                    setRowIndex(i);
                 }
             }
         }
@@ -1093,7 +842,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
         }
         finally
         {
-            _setIndex(-1);
+            setRowIndex(-1);
             _restoreScopeValues();
         }
     }
@@ -1175,7 +924,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
                             // calculate count for RepeatStatus
                             _count = _calculateCountForIndex(invokeIndex);
                         }
-                        _setIndex(invokeIndex);
+                        setRowIndex(invokeIndex);
                         
                         if (!_isIndexAvailable())
                         {
@@ -1193,7 +942,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
                     {
                         // restore the previous count, index and scope values
                         _count = prevCount;
-                        _setIndex(prevIndex);
+                        setRowIndex(prevIndex);
                         _restoreScopeValues();
                     }
                 }
@@ -1273,7 +1022,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
 
             // reset index and save scope values
             _captureScopeValues();
-            _setIndex(-1);
+            setRowIndex(-1);
 
             try
             {
@@ -1319,7 +1068,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
                             end = (end >= 0) ? i + end : Integer.MAX_VALUE - 1;
                             _count = 0;
 
-                            _setIndex(i);
+                            setRowIndex(i);
                             while (i < end && _isIndexAvailable())
                             {
                                 for (int j = 0, childCount = getChildCount(); j < childCount; j++)
@@ -1334,7 +1083,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
                                 _count++;
                                 i += step;
 
-                                _setIndex(i);
+                                setRowIndex(i);
                             }
                         }
                     }
@@ -1346,7 +1095,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
 
                 // restore the previous count, index and scope values
                 _count = prevCount;
-                _setIndex(prevIndex);
+                setRowIndex(prevIndex);
                 _restoreScopeValues();
             }
         }
@@ -1450,7 +1199,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
                     // calculate count for RepeatStatus
                     _count = _calculateCountForIndex(this._index);
                 }
-                owner._setIndex(this._index);
+                owner.setRowIndex(this._index);
                 if (owner._isIndexAvailable())
                 {
                     _target.processListener(listener);
@@ -1460,7 +1209,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
             {
                 // restore the previous count, index and scope values
                 owner._count = prevCount;
-                owner._setIndex(prevIndex);
+                owner.setRowIndex(prevIndex);
                 owner._restoreScopeValues();
             }
         }
@@ -1496,7 +1245,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
                     // calculate count for RepeatStatus
                     _count = _calculateCountForIndex(idxEvent.getIndex());
                 }
-                _setIndex(idxEvent.getIndex());
+                setRowIndex(idxEvent.getIndex());
                 if (_isIndexAvailable())
                 {
                     // get the target FacesEvent
@@ -1536,7 +1285,7 @@ public class UIRepeat extends UIComponentBase implements NamingContainer
             {
                 // restore the previous count, index and scope values
                 _count = prevCount;
-                _setIndex(prevIndex);
+                setRowIndex(prevIndex);
                 _restoreScopeValues();
             }
         }
