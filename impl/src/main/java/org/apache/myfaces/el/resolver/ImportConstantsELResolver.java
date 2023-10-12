@@ -22,8 +22,8 @@ import java.beans.FeatureDescriptor;
 import static java.lang.String.format;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Collections;
+// import java.util.Collection;
+// import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,12 +35,12 @@ import jakarta.el.ELException;
 import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.el.PropertyNotWritableException;
-import jakarta.faces.component.UIImportConstants;
+// import jakarta.faces.component.UIImportConstants;
 import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.view.ViewMetadata;
+// import jakarta.faces.view.ViewMetadata;
 import org.apache.myfaces.util.lang.ClassUtils;
-import org.apache.myfaces.view.facelets.FaceletViewDeclarationLanguage;
+// import org.apache.myfaces.view.facelets.FaceletViewDeclarationLanguage;
 
 /**
  *
@@ -50,7 +50,7 @@ public final class ImportConstantsELResolver extends ELResolver
     private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
     private static final String ERROR_FIELD_ACCESS = "Cannot access constant field '%s' of type '%s'.";
 
-    private static final String IMPORT_CONSTANTS = "oam.importConstants";
+    private static final String IMPORT_CONSTANTS = "oam.importConstants2";
     
     private Map<String, Map<String, Object>> constantsTypeMap = new ConcurrentHashMap<>();
 
@@ -88,31 +88,32 @@ public final class ImportConstantsELResolver extends ELResolver
                 viewRoot.getTransientStateHelper().getTransient(IMPORT_CONSTANTS);
         if (importConstantsMap == null)
         {
-            Collection<UIImportConstants> constants = ViewMetadata.getImportConstants(viewRoot);
-            if (constants != null && !constants.isEmpty())
-            {
-                importConstantsMap = new HashMap<>();
-                for (UIImportConstants c : constants)
-                {
-                    String var = c.getVar();
-                    String type = c.getType();
-                    if (var == null) 
-                    {
-                        int innerClass = type.lastIndexOf('$');
-                        int outerClass = type.lastIndexOf('.');
-                        var = type.substring(Math.max(innerClass, outerClass) + 1);
-                    }                    
-                    importConstantsMap.put(var, type);
-                }
-            } 
-            else
-            {
-                importConstantsMap = Collections.emptyMap();
-            }
-            if (!FaceletViewDeclarationLanguage.isBuildingViewMetadata(facesContext))
-            {
-                viewRoot.getTransientStateHelper().putTransient(IMPORT_CONSTANTS, importConstantsMap);
-            }
+            System.out.println("importConstantsMap is EMPTY!");
+            // Collection<UIImportConstants> constants = ViewMetadata.getImportConstants(viewRoot);
+            // if (constants != null && !constants.isEmpty())
+            // {
+            //     importConstantsMap = new HashMap<>();
+            //     for (UIImportConstants c : constants)
+            //     {
+            //         String var = c.getVar();
+            //         String type = c.getType();
+            //         if (var == null) 
+            //         {
+            //             int innerClass = type.lastIndexOf('$');
+            //             int outerClass = type.lastIndexOf('.');
+            //             var = type.substring(Math.max(innerClass, outerClass) + 1);
+            //         }                    
+            //         importConstantsMap.put(var, type);
+            //     }
+            // } 
+            // else
+            // {
+            //     importConstantsMap = Collections.emptyMap();
+            // }
+            // if (!FaceletViewDeclarationLanguage.isBuildingViewMetadata(facesContext))
+            // {
+            //     viewRoot.getTransientStateHelper().putTransient(IMPORT_CONSTANTS, importConstantsMap);
+            // }
         }
 
         if (importConstantsMap != null && !importConstantsMap.isEmpty())

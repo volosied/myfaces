@@ -78,6 +78,8 @@ public final class CoreLibrary extends AbstractTagLibrary
         this.addTagHandler("loadBundle", LoadBundleHandler.class);
 
         this.addTagHandler("metadata", ViewMetadataHandler.class);
+
+        this.addTagHandler("importConstants2", ImportConstantsHandler.class);
         
         this.addComponent("param", UIParameter.COMPONENT_TYPE, null);
         
