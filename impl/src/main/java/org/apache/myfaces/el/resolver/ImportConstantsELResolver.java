@@ -83,37 +83,15 @@ public final class ImportConstantsELResolver extends ELResolver
         {
             return null;
         }
-
+        System.out.println("Using viewroot: " + viewRoot);
+        // Map<String, String> importConstantsMap = (Map<String, String>) 
+        //         viewRoot.getTransientStateHelper().getTransient(IMPORT_CONSTANTS);
         Map<String, String> importConstantsMap = (Map<String, String>) 
-                viewRoot.getTransientStateHelper().getTransient(IMPORT_CONSTANTS);
+            facesContext.getExternalContext().getRequestMap().get(IMPORT_CONSTANTS);
+            
         if (importConstantsMap == null)
         {
             System.out.println("importConstantsMap is EMPTY!");
-            // Collection<UIImportConstants> constants = ViewMetadata.getImportConstants(viewRoot);
-            // if (constants != null && !constants.isEmpty())
-            // {
-            //     importConstantsMap = new HashMap<>();
-            //     for (UIImportConstants c : constants)
-            //     {
-            //         String var = c.getVar();
-            //         String type = c.getType();
-            //         if (var == null) 
-            //         {
-            //             int innerClass = type.lastIndexOf('$');
-            //             int outerClass = type.lastIndexOf('.');
-            //             var = type.substring(Math.max(innerClass, outerClass) + 1);
-            //         }                    
-            //         importConstantsMap.put(var, type);
-            //     }
-            // } 
-            // else
-            // {
-            //     importConstantsMap = Collections.emptyMap();
-            // }
-            // if (!FaceletViewDeclarationLanguage.isBuildingViewMetadata(facesContext))
-            // {
-            //     viewRoot.getTransientStateHelper().putTransient(IMPORT_CONSTANTS, importConstantsMap);
-            // }
         }
 
         if (importConstantsMap != null && !importConstantsMap.isEmpty())

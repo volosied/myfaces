@@ -41,6 +41,8 @@ public class FacesELContext extends ELContext
     {
         this.elResolver = elResolver;
         putContext(FacesContext.class, facesContext);
+        System.out.println("Created: " + this + " with " + facesContext);
+        Thread.dumpStack();
     }
 
     @Override

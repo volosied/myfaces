@@ -67,8 +67,11 @@ public final class ImportConstantsHandler extends TagHandler
     {
       System.out.println("apply - ICH");
       UIViewRoot viewRoot = ctx.getFacesContext().getViewRoot();
-      Map<String, String> importConstantsMap = (Map<String, String>) 
-                viewRoot.getTransientStateHelper().getTransient(IMPORT_CONSTANTS);
+      System.out.println("Using viewroot: " + viewRoot);
+    //   Map<String, String> importConstantsMap = (Map<String, String>) 
+    //             viewRoot.getTransientStateHelper().getTransient(IMPORT_CONSTANTS);
+    Map<String, String> importConstantsMap = (Map<String, String>) ctx.getFacesContext().
+        getExternalContext().getRequestMap().get(IMPORT_CONSTANTS);
            System.out.println("apply - importConstantsMap " + importConstantsMap);      
         if (importConstantsMap == null)
         {
@@ -91,7 +94,8 @@ public final class ImportConstantsHandler extends TagHandler
                     }                    
             if (!FaceletViewDeclarationLanguage.isBuildingViewMetadata(ctx.getFacesContext()))
             {
-                viewRoot.getTransientStateHelper().putTransient(IMPORT_CONSTANTS, importConstantsMap);
+                // viewRoot.getTransientStateHelper().putTransient(IMPORT_CONSTANTS, importConstantsMap);
+                ctx.getFacesContext().getExternalContext().getRequestMap().put(IMPORT_CONSTANTS, importConstantsMap);
             }
         }  
     }
