@@ -27,6 +27,7 @@ import java.util.Map;
 import jakarta.faces.component.UIComponent;
 // import jakarta.faces.component.UIImportConstants;
 import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.context.FacesContext;
 // import jakarta.faces.view.ViewMetadata;
 import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagAttribute;
@@ -35,6 +36,7 @@ import jakarta.faces.view.facelets.TagHandler;
 
 import org.apache.myfaces.buildtools.maven2.plugin.builder.annotation.JSFFaceletAttribute;
 import org.apache.myfaces.buildtools.maven2.plugin.builder.annotation.JSFFaceletTag;
+// import org.apache.myfaces.renderkit.html.util.ResourceUtils;
 import org.apache.myfaces.view.facelets.FaceletViewDeclarationLanguage;
 
 /**
@@ -97,6 +99,11 @@ public final class ImportConstantsHandler extends TagHandler
                 // viewRoot.getTransientStateHelper().putTransient(IMPORT_CONSTANTS, importConstantsMap);
                 ctx.getFacesContext().getExternalContext().getRequestMap().put(IMPORT_CONSTANTS, importConstantsMap);
             }
-        }  
+        } 
+        
+       UIComponent c = this.createComponent(ctx);
+                   UIComponent outputScript = FacesContext.getCurrentInstance().getApplication().
+                createComponent(FacesContext.getCurrentInstance(), "jakarta.faces.ImportConstants",null);
+                System.out.println(c);
     }
 }
