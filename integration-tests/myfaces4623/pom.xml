@@ -26,7 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.apache.myfaces.core.integration-tests</groupId>
-    <artifactId>protectedViews</artifactId>
+    <artifactId>myfaces4623</artifactId>
     <name>Apache MyFaces Core 5.0 - Integration Tests - protectedViews</name>
     <packaging>war</packaging>
 

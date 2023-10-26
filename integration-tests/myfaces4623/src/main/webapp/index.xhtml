@@ -29,25 +29,25 @@
         <script type="text/javascript">
             faces.ajax.addOnError(function(data){
                 //alert("error occurred! " + data.message);
-                
+                document.querySelector("#message").innerHTML =  data.errorName;
             });
         </script>
 
         <div jsf:id="loop">
             <c:forEach var="item" items="${bean.count}">
-                <test:customComponent id="input2" value="TEST2" styleClass="input" />
+                <test:customComponent id="text" value="DISPLAYING COMPONENT" styleClass="input" />
             </c:forEach>
         </div>
 
-        <h:commandButton id="submitButton" value="display" action="${bean.setToOne()}">
+        <h:commandButton id="display" value="display" action="${bean.setToOne()}">
             <f:ajax execute="@form" render="loop" />
         </h:commandButton>
 
-        <h:commandButton id="submitButton2" value="close" action="${bean.resetToZero()}">
+        <h:commandButton id="close" value="close" action="${bean.resetToZero()}">
             <f:ajax execute="@form" render="loop" />
         </h:commandButton>
 
-        <div id="messages"> </div>
+        <div id="message"> </div>
     </h:form>
 
 </h:body>

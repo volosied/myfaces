@@ -36,6 +36,11 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ByIdOrName;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 @RunWith(Arquillian.class)
 @RunAsClient
@@ -92,15 +97,22 @@ public class IntegrationTest
         Assert.assertTrue(webDriver.getPageSource().contains("display"));
 
         Assert.assertTrue(webDriver.getPageSource().contains("close"));
-        
-        WebElement displayButton = webDriver.findElement(By.id("display"));
-        displayButton.click();
 
-        WebElement closeButton = webDriver.findElement(By.id("display"));
-        closeButton.click();
+        System.out.println(webDriver.getPageSource());
 
+        trigger("form1:display", webDriver ->
+        {
+            return webDriver.getPageSource().contains("DISPLAYING COMPONENT");
+        });
 
-        Assert.assertFalse(webDriver.getPageSource().contains("error occurred!"));
+        Assert.assertFalse(webDriver.getPageSource().contains("DISPLAYING COMPONENT"));
+
+        trigger("form1:close", webDriver ->
+        {
+            return !webDriver.getPageSource().contains("DISPLAYING COMPONENT");
+        });
+
+        Assert.assertFalse(webDriver.getPageSource().contains("DuplicateIdException"));
     }
     
 
@@ -113,7 +125,7 @@ public class IntegrationTest
      */
     void trigger(String id, ExpectedCondition<Boolean> condition)
     {
-        webDriver.findElement(new ByIdOrName(id)).click();
+        webDriver.findElement(By.id(id)).click();
         WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofMillis(200));
         wait.until(condition);
     }
