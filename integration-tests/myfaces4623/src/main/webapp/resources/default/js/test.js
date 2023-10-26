@@ -1,0 +1,1 @@
+console.log("js resource added succesfully!");
