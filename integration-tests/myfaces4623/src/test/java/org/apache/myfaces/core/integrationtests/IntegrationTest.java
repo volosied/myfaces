@@ -105,12 +105,14 @@ public class IntegrationTest
             return webDriver.getPageSource().contains("DISPLAYING COMPONENT");
         });
 
-        Assert.assertFalse(webDriver.getPageSource().contains("DISPLAYING COMPONENT"));
+        Assert.assertTrue(webDriver.getPageSource().contains("DISPLAYING COMPONENT"));
 
         trigger("form1:close", webDriver ->
         {
             return !webDriver.getPageSource().contains("DISPLAYING COMPONENT");
         });
+
+        System.out.println(webDriver.getPageSource());
 
         Assert.assertFalse(webDriver.getPageSource().contains("DuplicateIdException"));
     }
