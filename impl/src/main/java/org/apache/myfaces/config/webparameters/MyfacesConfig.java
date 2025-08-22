@@ -472,6 +472,7 @@ public class MyfacesConfig
     
     /**
      * Sets the random algorithm to initialize the secure random id generator. 
+     * Also used to initalize the Token Generator
      * By default is SHA1PRNG
      */
     @JSFWebConfigParam(since="2.1.9, 2.0.15", defaultValue="SHA1PRNG", group="state")

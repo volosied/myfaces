@@ -23,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.myfaces.config.webparameters.MyfacesConfig;
+
 /**
  *
  * @author lu4242
@@ -30,9 +32,19 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TokenGenerator
 {
     private final AtomicLong seed;
+
+    /*
+     * Defaults to the RANDOM_KEY_IN_VIEW_STATE_SESSION_TOKEN_SECURE_RANDOM_ALGORITHM option. 
+     */
+    private String secureAlgorithm;
     
     public TokenGenerator()
     {
+
+        MyfacesConfig config = MyfacesConfig.getCurrentInstance();
+
+        secureAlgorithm = config.getRandomKeyInViewStateSessionTokenSecureRandomAlgorithm();
+
         seed = new AtomicLong(generateSeed());
     }
     
@@ -41,8 +53,7 @@ public class TokenGenerator
         SecureRandom rng;
         try
         {
-            // try SHA1 first
-            rng = SecureRandom.getInstance("SHA1PRNG");
+            rng = SecureRandom.getInstance(secureAlgorithm);
         }
         catch (NoSuchAlgorithmException e)
         {
@@ -77,4 +88,10 @@ public class TokenGenerator
     {
         return seed;
     }
+
+    public void setSecureAlgorithm(String secureAlgorithm)
+    {
+        this.secureAlgorithm = secureAlgorithm;
+    }
+
 }

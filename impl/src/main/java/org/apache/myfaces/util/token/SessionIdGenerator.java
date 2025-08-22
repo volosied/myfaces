@@ -64,7 +64,7 @@ public class SessionIdGenerator
      * will be created using the defaults. If that fails, the {@link
      * SecureRandom} instances will be created using platform defaults.
      */
-    private String secureRandomAlgorithm = "SHA1PRNG";
+    private String secureRandomAlgorithm;
     
     /**
      * The name of the provider to use to create instances of
@@ -249,19 +249,6 @@ public class SessionIdGenerator
             {
                 log.log(Level.SEVERE, "Exception initializing random number generator using provider: " + 
                         secureRandomProvider, e);
-            }
-        }
-
-        if (result == null)
-        {
-            // Invalid provider / algorithm
-            try
-            {
-                result = SecureRandom.getInstance("SHA1PRNG");
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                log.log(Level.SEVERE, "Invalid provider / algoritm SHA1PRNG for generate secure random token", e);
             }
         }
 
