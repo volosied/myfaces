@@ -28,6 +28,8 @@ import jakarta.el.CompositeELResolver;
 import jakarta.el.ELResolver;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
+import jakarta.el.OptionalELResolver;
+import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import jakarta.enterprise.inject.spi.BeanManager;
@@ -50,6 +52,7 @@ import org.apache.myfaces.el.resolver.implicitobject.ImplicitObjectResolver;
 import org.apache.myfaces.core.api.shared.lang.PropertyDescriptorUtils;
 import org.apache.myfaces.el.resolver.EmptyStringToNullELResolver;
 import org.apache.myfaces.el.resolver.LambdaBeanELResolver;
+import org.apache.myfaces.util.ExternalSpecifications;
 
 /**
  * Create the el resolver for faces. see 1.2 spec section 5.6.2
