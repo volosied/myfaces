@@ -18,7 +18,6 @@
  */
 package org.apache.myfaces.el.resolver.implicitobject;
 
-import java.util.Map;
 import jakarta.el.ELContext;
 
 /**

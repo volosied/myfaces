@@ -19,7 +19,6 @@
 package org.apache.myfaces.el.resolver.implicitobject;
 
 import jakarta.el.ELContext;
-import java.util.Map;
 
 /**
  * Encapsulates information needed by the ImplicitObjectResolver

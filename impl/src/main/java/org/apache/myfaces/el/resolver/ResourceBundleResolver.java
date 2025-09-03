@@ -18,9 +18,6 @@
  */
 package org.apache.myfaces.el.resolver;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.ResourceBundle;
 import jakarta.el.ELContext;
 import jakarta.el.ELException;

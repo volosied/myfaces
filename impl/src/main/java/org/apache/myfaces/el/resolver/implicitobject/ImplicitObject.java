@@ -18,9 +18,7 @@
  */
 package org.apache.myfaces.el.resolver.implicitobject;
 
-import java.beans.FeatureDescriptor;
 import jakarta.el.ELContext;
-import jakarta.el.ELResolver;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 
