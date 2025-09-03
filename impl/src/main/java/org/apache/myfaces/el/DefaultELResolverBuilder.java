@@ -149,6 +149,24 @@ public class DefaultELResolverBuilder extends ELResolverBuilder
         list.add(new MapELResolver());
         list.add(new ListELResolver());
         list.add(new ArrayELResolver());
+
+            if (ExternalSpecifications.isEL6Available())
+        {
+            try
+            {
+                if(!config.isOptionalELResolverDisabled()) 
+                {
+                    System.out.print("ADDED EL OP");
+                    list.add(new OptionalELResolver()); // not disabled (default), so add it in.
+                }
+                list.add(new RecordELResolver());
+            }
+            catch (Throwable ex)
+            {
+                LOG.log(Level.WARNING, "Could not add OptionalELResolver / RecordELResolver!", ex);
+            }
+        }
+
         if (PropertyDescriptorUtils.isUseLambdaMetafactory(facesContext.getExternalContext()))
         {
             list.add(new LambdaBeanELResolver());
