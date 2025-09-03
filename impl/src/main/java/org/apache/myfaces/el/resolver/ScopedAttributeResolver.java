@@ -132,24 +132,6 @@ public class ScopedAttributeResolver extends ELResolver
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(final ELContext context, final Object base)
-    {
-
-        if (base != null)
-        {
-            return null;
-        }
-
-        final List<FeatureDescriptor> descriptorList = new ArrayList<FeatureDescriptor>();
-        final ExternalContext extContext = externalContext(context);
-        addDescriptorsToList(descriptorList, extContext.getRequestMap());
-        addDescriptorsToList(descriptorList, extContext.getSessionMap());
-        addDescriptorsToList(descriptorList, extContext.getApplicationMap());
-
-        return descriptorList.iterator();
-    }
-
-    @Override
     public Class<?> getCommonPropertyType(final ELContext context, final Object base)
     {
 

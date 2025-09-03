@@ -75,12 +75,6 @@ public class CopyBeanInterceptorELResolver extends ELResolver
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(final ELContext ctx, final Object base)
-    {
-        return resolver.getFeatureDescriptors(ctx, base);
-    }
-
-    @Override
     public Class<?> getCommonPropertyType(final ELContext ctx, final Object base)
     {
         return resolver.getCommonPropertyType(ctx, base);

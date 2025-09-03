@@ -19,12 +19,10 @@
 
 package org.apache.myfaces.test.el;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.faces.component.UIViewRoot;
@@ -38,7 +36,7 @@ import jakarta.faces.context.FacesContext;
  *
  * @since 1.0.0
  */
-public class FacesImplicitObjectELResolver extends AbstractELResolver
+public class FacesImplicitObjectELResolver extends ELResolver
 {
 
     /**
@@ -80,38 +78,6 @@ public class FacesImplicitObjectELResolver extends AbstractELResolver
         {
             return String.class;
         }
-
-    }
-
-    /**
-     * <p>Return an <code>Iterator</code> over the attributes that this
-     * resolver knows how to deal with.</p>
-     *
-     * @param context <code>ELContext</code> for evaluating this value
-     * @param base Base object against which this evaluation occurs
-     */
-    public Iterator getFeatureDescriptors(ELContext context, Object base)
-    {
-
-        if (base != null)
-        {
-            return null;
-        }
-
-        // Create the variables we will need
-        FacesContext fcontext = (FacesContext) context
-                .getContext(FacesContext.class);
-        List descriptors = new ArrayList();
-
-        // Add feature descriptors for each implicit object
-        for (int i = 0; i < NAMES.length; i++)
-        {
-            descriptors.add(descriptor(NAMES[i], NAMES[i], NAMES[i], false,
-                    false, true, TYPES[i], true));
-        }
-
-        // Return the accumulated descriptors
-        return descriptors.iterator();
 
     }
 

@@ -155,12 +155,6 @@ public final class ImportConstantsELResolver extends ELResolver
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(final ELContext context, final Object base)
-    {
-        return null;
-    }
-
-    @Override
     public Class<?> getCommonPropertyType(final ELContext context, final Object base)
     {
         return base == null ? Object.class : null;

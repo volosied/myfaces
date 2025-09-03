@@ -286,29 +286,6 @@ public class FlashELResolver extends ELResolver
         return null;
     }
 
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-    {
-        ArrayList<FeatureDescriptor> descriptors = new ArrayList<>(1);
-
-        descriptors.add(makeDescriptor(FLASH,
-                "Represents the current flash scope", Object.class));
-
-        if (base instanceof Flash)
-        {
-            Iterator itr = ((Flash) base).keySet().iterator();
-            Object key;
-            FeatureDescriptor desc;
-            while (itr.hasNext())
-            {
-                key = itr.next();
-                desc = makeDescriptor(key.toString(), key.toString(), key.getClass());
-                descriptors.add(desc);
-            }
-        }
-        return descriptors.iterator();
-    }
-
     protected FeatureDescriptor makeDescriptor(String name, String description,
             Class<?> elResolverType)
     {

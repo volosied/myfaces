@@ -19,9 +19,8 @@
 
 package org.apache.myfaces.test.el;
 
-import java.util.Iterator;
-
 import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.faces.FacesException;
 
@@ -32,7 +31,7 @@ import jakarta.faces.FacesException;
  *
  * @since 1.0.0
  */
-public class FacesVariableResolverChainWrapper extends AbstractELResolver
+public class FacesVariableResolverChainWrapper extends ELResolver
 {
 
     /**
@@ -50,20 +49,6 @@ public class FacesVariableResolverChainWrapper extends AbstractELResolver
         {
             return String.class;
         }
-
-    }
-
-    /**
-     * <p>Return an <code>Iterator</code> over the attributes that this
-     * resolver knows how to deal with.</p>
-     *
-     * @param context <code>ELContext</code> for evaluating this value
-     * @param base Base object against which this evaluation occurs
-     */
-    public Iterator getFeatureDescriptors(ELContext context, Object base)
-    {
-
-        return null;
 
     }
 

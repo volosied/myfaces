@@ -232,24 +232,6 @@ public class ImplicitObjectResolver extends ELResolver
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-    {
-        if (base != null)
-        {
-            return null;
-        }
-
-        ArrayList<FeatureDescriptor> descriptors = new ArrayList<>(implicitObjects.size());
-
-        for (ImplicitObject obj : implicitObjects.values())
-        {
-            descriptors.add(obj.getDescriptor());
-        }
-
-        return descriptors.iterator();
-    }
-
-    @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base)
     {
         if (base != null)

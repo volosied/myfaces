@@ -68,13 +68,6 @@ public final class CompositeComponentELResolver extends ELResolver
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-    {
-        // Per the spec, do nothing.
-        return null;
-    }
-
-    @Override
     public Class<?> getType(ELContext context, Object base, Object property)
     {
         if (base != null

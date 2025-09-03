@@ -167,26 +167,6 @@ public final class ResourceBundleResolver extends ELResolver
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(final ELContext context, final Object base)
-    {
-        if (base != null)
-        {
-            return null;
-        }
-
-        final Map<String, org.apache.myfaces.config.element.ResourceBundle> resourceBundles =
-                runtimeConfig(context).getResourceBundles();
-        
-        final ArrayList<FeatureDescriptor> descriptors = new ArrayList<>(resourceBundles.size());
-        for (org.apache.myfaces.config.element.ResourceBundle resourceBundle : resourceBundles.values())
-        {
-            descriptors.add(makeDescriptor(resourceBundle));
-        }
-
-        return descriptors.iterator();
-    }
-
-    @Override
     public Class<?> getCommonPropertyType(final ELContext context, final Object base)
     {
         if (base != null)

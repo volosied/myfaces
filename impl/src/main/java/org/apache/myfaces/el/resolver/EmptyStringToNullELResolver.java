@@ -43,12 +43,6 @@ public class EmptyStringToNullELResolver extends ELResolver
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base)
-    {
-        return null;
-    }
-
-    @Override
     public Class<?> getType(ELContext context, Object base, Object property)
     {
         return null;

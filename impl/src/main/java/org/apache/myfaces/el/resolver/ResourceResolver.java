@@ -59,13 +59,6 @@ public final class ResourceResolver extends ELResolver
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(
-            final ELContext context, final Object base)
-    {
-        return null;
-    }
-
-    @Override
     public Class<?> getType(final ELContext context, final Object base,
             final Object property)
     {

@@ -19,17 +19,13 @@
 
 package org.apache.myfaces.test.el;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Map.Entry;
 
 import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.el.PropertyNotWritableException;
 import jakarta.faces.context.FacesContext;
-import org.apache.myfaces.test.mock.MockApplication;
 
 /**
  * <p><code>ELResolver</code> implementation that accesses resource bundles
@@ -38,7 +34,7 @@ import org.apache.myfaces.test.mock.MockApplication;
  *
  * @since 1.0.0
  */
-public class FacesResourceBundleELResolver extends AbstractELResolver
+public class FacesResourceBundleELResolver extends ELResolver
 {
 
     /**
@@ -56,46 +52,6 @@ public class FacesResourceBundleELResolver extends AbstractELResolver
         {
             return String.class;
         }
-
-    }
-
-    /**
-     * <p>Return an <code>Iterator</code> over the attributes that this
-     * resolver knows how to deal with.</p>
-     *
-     * @param context <code>ELContext</code> for evaluating this value
-     * @param base Base object against which this evaluation occurs
-     */
-    public Iterator getFeatureDescriptors(ELContext context, Object base)
-    {
-
-        if (base != null)
-        {
-            return null;
-        }
-
-        // Create the variables we will need
-        List descriptors = new ArrayList();
-        FacesContext fcontext = (FacesContext) context
-                .getContext(FacesContext.class);
-        MockApplication application = (MockApplication) fcontext.getApplication();
-        String key = null;
-        Object value = null;
-
-        // Create a feature descriptor for each configured resource bundle
-        Iterator entries = application.getResourceBundles().entrySet()
-                .iterator();
-        while (entries.hasNext())
-        {
-            Entry entry = (Entry) entries.next();
-            key = (String) entry.getKey();
-            value = entry.getValue();
-            descriptors.add(descriptor(key, key, "Resource Bundle " + key,
-                    false, false, true, ResourceBundle.class, true));
-        }
-
-        // Return the accumulated descriptors
-        return descriptors.iterator();
 
     }
 
