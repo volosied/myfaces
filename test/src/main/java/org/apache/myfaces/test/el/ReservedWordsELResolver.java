@@ -18,7 +18,6 @@
  */
 package org.apache.myfaces.test.el;
 
-import java.beans.FeatureDescriptor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,8 +43,6 @@ public class ReservedWordsELResolver extends ELResolver
         values.put("null", null);
         VALUES = Collections.unmodifiableMap(values);
     }
-
-    private List<FeatureDescriptor> featureDescriptors;
 
     @Override
     public Object getValue(ELContext context, Object base, Object property)

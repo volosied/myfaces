@@ -55,10 +55,4 @@ public class SessionScopeImplicitObject extends ImplicitObject
         return null;
     }
 
-    @Override
-    public FeatureDescriptor getDescriptor()
-    {
-        return makeDescriptor(NAME, "Session scope attributes", Map.class);
-    }
-
 }

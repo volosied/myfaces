@@ -18,14 +18,12 @@
  */
 package org.apache.myfaces.el.resolver;
 
-import java.beans.FeatureDescriptor;
 import static java.lang.String.format;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import static java.util.logging.Level.FINE;

@@ -26,10 +26,6 @@ import jakarta.el.PropertyNotWritableException;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.Flash;
-import java.beans.FeatureDescriptor;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 /**
  * Resolver for Flash object 
  * 
@@ -284,21 +280,6 @@ public class FlashELResolver extends ELResolver
         }
 
         return null;
-    }
-
-    protected FeatureDescriptor makeDescriptor(String name, String description,
-            Class<?> elResolverType)
-    {
-        FeatureDescriptor fd = new FeatureDescriptor();
-        fd.setValue(ELResolver.RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
-        fd.setValue(ELResolver.TYPE, elResolverType);
-        fd.setName(name);
-        fd.setDisplayName(name);
-        fd.setShortDescription(description);
-        fd.setExpert(false);
-        fd.setHidden(false);
-        fd.setPreferred(true);
-        return fd;
     }
 
     @Override

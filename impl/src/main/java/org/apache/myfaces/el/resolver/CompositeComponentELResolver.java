@@ -19,11 +19,9 @@
 package org.apache.myfaces.el.resolver;
 
 import java.beans.BeanInfo;
-import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;

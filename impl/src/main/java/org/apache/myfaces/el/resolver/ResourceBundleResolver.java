@@ -18,7 +18,6 @@
  */
 package org.apache.myfaces.el.resolver;
 
-import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -206,19 +205,5 @@ public final class ResourceBundleResolver extends ELResolver
         }
 
         return runtimeConfig;
-    }
-
-    private static FeatureDescriptor makeDescriptor(org.apache.myfaces.config.element.ResourceBundle bundle)
-    {
-        final FeatureDescriptor fd = new FeatureDescriptor();
-        fd.setValue(ELResolver.RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
-        fd.setName(bundle.getVar());
-        fd.setDisplayName(bundle.getDisplayName());
-        fd.setValue(ELResolver.TYPE, ResourceBundle.class);
-        fd.setShortDescription("");
-        fd.setExpert(false);
-        fd.setHidden(false);
-        fd.setPreferred(true);
-        return fd;
     }
 }

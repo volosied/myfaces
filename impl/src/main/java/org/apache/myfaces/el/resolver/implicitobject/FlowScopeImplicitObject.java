@@ -19,8 +19,6 @@
 package org.apache.myfaces.el.resolver.implicitobject;
 
 import jakarta.el.ELContext;
-import java.beans.FeatureDescriptor;
-import java.util.Map;
 import jakarta.faces.context.FacesContext;
 
 /**
@@ -56,11 +54,4 @@ public class FlowScopeImplicitObject extends ImplicitObject
     {
         return null;
     }
-
-    @Override
-    public FeatureDescriptor getDescriptor()
-    {
-        return makeDescriptor(NAME, "Flow scope attributes", Map.class);
-    }
-
 }

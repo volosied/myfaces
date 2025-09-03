@@ -28,9 +28,6 @@ import jakarta.el.PropertyNotWritableException;
 import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
-import java.beans.FeatureDescriptor;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -141,32 +138,6 @@ public class ScopedAttributeResolver extends ELResolver
         }
 
         return String.class;
-    }
-
-    // side effect: modifies the list
-    private static void addDescriptorsToList(final List<FeatureDescriptor> descriptorList,
-                                             final Map<String, Object> scopeMap)
-    {
-        for (Object name : scopeMap.keySet())
-        {
-            String strName = (String)name;
-            Class<?> runtimeType = scopeMap.get(strName).getClass();
-            descriptorList.add(makeDescriptor(strName, runtimeType));
-        }
-    }
-
-    private static FeatureDescriptor makeDescriptor(final String name, final Class<?> runtimeType)
-    {
-        FeatureDescriptor fd = new FeatureDescriptor();
-        fd.setValue(ELResolver.RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
-        fd.setValue(ELResolver.TYPE, runtimeType);
-        fd.setName(name);
-        fd.setDisplayName(name);
-        fd.setShortDescription(name);
-        fd.setExpert(false);
-        fd.setHidden(false);
-        fd.setPreferred(true);
-        return fd;
     }
 
     // returns null if not found

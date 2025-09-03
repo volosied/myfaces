@@ -19,8 +19,6 @@
 
 package org.apache.myfaces.component.validate;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 
