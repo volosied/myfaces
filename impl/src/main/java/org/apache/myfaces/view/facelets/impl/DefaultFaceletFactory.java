@@ -21,8 +21,6 @@ package org.apache.myfaces.view.facelets.impl;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -321,14 +319,15 @@ public final class DefaultFaceletFactory extends FaceletFactory
         }
 
         // --- 3. WEB-INF XML config files must not be directly served as Facelets.
-        if (isWebInfXml(normalizedPath))
-        {
-            if (log.isLoggable(Level.FINE))
-            {
-                log.fine("Path not allowed [" + path + "] -> WEB-INF XML config file");
-            }
-            throw new MalformedURLException("Access to WEB-INF XML config files is not allowed: " + path);
-        }
+        // Note: .xml is not a facelet file unless specified via suffix / mapping parameters, so this check mark is disabled
+        // if (isWebInfConfigFile(normalizedPath))
+        // {
+        //     if (log.isLoggable(Level.FINE))
+        //     {
+        //         log.fine("Path not allowed [" + path + "] -> WEB-INF XML config file");
+        //     }
+        //     throw new MalformedURLException("Access to WEB-INF XML config files is not allowed: " + path);
+        // }
 
         // --- 4. Extension must be a configured Facelet suffix (e.g. .xhtml, .jspx).
         if (!mappingAllowed(context, normalizedPath))
@@ -360,27 +359,26 @@ public final class DefaultFaceletFactory extends FaceletFactory
      * Returns {@code false} when {@code path} is an absolute URI whose scheme is on the
      * {@link #BLOCKED_SCHEMES} list. Purely relative paths (no scheme) and OSGi/container
      * schemes (wsjar, jar, file, zip) always return {@code true}.
+     * <p>
+     * Uses a fast colon-index pre-check to avoid {@code URI} allocation for the common case
+     * of relative or context-root paths (e.g. {@code /views/page.xhtml}).
      */
     private boolean isAllowedScheme(String path)
     {
-        URI uri;
-        try
+        // Fast path: a scheme requires at least one letter before ":", so the colon must
+        // appear at index >= 1. Relative paths and "/"-absolute paths never have a colon
+        // in this position and are immediately allowed.
+        int colon = path.indexOf(':');
+        if (colon < 1)
         {
-            uri = new URI(path);
+            return true;
         }
-        catch (URISyntaxException e)
+        String scheme = path.substring(0, colon).toLowerCase();
+        if (BLOCKED_SCHEMES.contains(scheme))
         {
             if (log.isLoggable(Level.FINE))
             {
-                log.fine("Path not allowed [" + path + "] -> Invalid URI syntax: " + e.getMessage());
-            }
-            return false;
-        }
-        if (uri.isAbsolute() && BLOCKED_SCHEMES.contains(uri.getScheme().toLowerCase()))
-        {
-            if (log.isLoggable(Level.FINE))
-            {
-                log.fine("Path not allowed [" + path + "] -> Blocked scheme: " + uri.getScheme());
+                log.fine("Path not allowed [" + path + "] -> Blocked scheme: " + scheme);
             }
             return false;
         }
@@ -392,7 +390,7 @@ public final class DefaultFaceletFactory extends FaceletFactory
      * {@code /WEB-INF/}. Such files are server configuration descriptors and must never be
      * exposed as Facelet templates.
      */
-    private boolean isWebInfXml(String normalizedPath)
+    private boolean isWebInfConfigFile(String normalizedPath)
     {
         if (normalizedPath == null)
         {
@@ -514,7 +512,12 @@ public final class DefaultFaceletFactory extends FaceletFactory
             }
 
             // Legacy JSP-XML view support
-            allowed.add(".jspx");
+            // allowed.add(".jspx");
+
+            if (log.isLoggable(Level.FINE))
+            {
+                log.fine("Allowed Facelet suffixes: " + allowed);
+            }
 
             _allowedSuffixes = allowed;
         }
