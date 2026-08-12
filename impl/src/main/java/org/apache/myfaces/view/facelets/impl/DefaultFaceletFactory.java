@@ -75,6 +75,7 @@ public final class DefaultFaceletFactory extends FaceletFactory
     private long _refreshPeriod;
     private Map<String, URL> _relativeLocations;
     private Map<String, Boolean> _managedFacelet;
+    private volatile Set<String> _allowedSuffixes;
     
     private FaceletCache<Facelet> _faceletCache;
     private AbstractFaceletCache<Facelet> _abstractFaceletCache;
@@ -303,14 +304,8 @@ public final class DefaultFaceletFactory extends FaceletFactory
 
         // UnitTest stage skips content-validation guards; tests use synthetic paths
         // that are not backed by a real WAR layout.
-        boolean isUnitTest = context.isProjectStage(ProjectStage.UnitTest);
-        System.out.println("[resolveURL] path=" + path
-                + " | isUnitTest=" + isUnitTest
-                + " | projectStage=" + context.getApplication().getProjectStage()
-                + " | resolved=" + resolved);
-        if (isUnitTest)
+        if (context.isProjectStage(ProjectStage.UnitTest))
         {
-            System.out.println("[resolveURL] SKIPPING guards (UnitTest stage)");
             return resolved;
         }
 
@@ -322,7 +317,6 @@ public final class DefaultFaceletFactory extends FaceletFactory
             {
                 log.fine("Path not allowed [" + path + "] -> resolved URL escapes application base");
             }
-            System.out.println("[resolveURL] BLOCKED by isWithinBase: base=" + getBaseUrl() + " resolved=" + resolved);
             throw new MalformedURLException("Path escapes application base: " + path);
         }
 
@@ -461,40 +455,7 @@ public final class DefaultFaceletFactory extends FaceletFactory
         }
         String ext = normalizedPath.substring(dotIndex);
 
-        ExternalContext ec = context.getExternalContext();
-
-        // Suffixes from jakarta.faces.FACELETS_SUFFIX (whitespace-separated, default ".xhtml")
-        String suffixParam = ec.getInitParameter(ViewHandler.FACELETS_SUFFIX_PARAM_NAME);
-        if (suffixParam == null)
-        {
-            suffixParam = ViewHandler.DEFAULT_FACELETS_SUFFIX;
-        }
-        Set<String> allowed = new HashSet<>(Arrays.asList(suffixParam.trim().split("\\s+")));
-
-        // Suffixes from jakarta.faces.FACELETS_VIEW_MAPPINGS (semicolon-separated; strip leading "*")
-        String mappingsParam = ec.getInitParameter(ViewHandler.FACELETS_VIEW_MAPPINGS_PARAM_NAME);
-        if (mappingsParam == null)
-        {
-            mappingsParam = ec.getInitParameter("facelets.VIEW_MAPPINGS");
-        }
-        if (mappingsParam != null)
-        {
-            for (String token : mappingsParam.split(";"))
-            {
-                token = token.trim();
-                if (token.startsWith("*."))
-                {
-                    // suffix mapping e.g. "*.xhtml" -> ".xhtml"
-                    allowed.add(token.substring(1));
-                }
-                // Prefix mappings like "/faces/*" carry no extension — skipped.
-            }
-        }
-
-        // Legacy JSP-XML view support
-        allowed.add(".jspx");
-
-        if (!allowed.contains(ext))
+        if (!getAllowedSuffixes(context).contains(ext))
         {
             if (log.isLoggable(Level.FINE))
             {
@@ -503,6 +464,61 @@ public final class DefaultFaceletFactory extends FaceletFactory
             return false;
         }
         return true;
+    }
+
+    /**
+     * Returns the set of allowed Facelet file suffixes, computed once from the application's
+     * init parameters and cached for the lifetime of this factory.
+     * <p>
+     * The set is built from:
+     * <ul>
+     *   <li>{@code jakarta.faces.FACELETS_SUFFIX} (whitespace-separated, default {@code .xhtml})</li>
+     *   <li>Suffix entries in {@code jakarta.faces.FACELETS_VIEW_MAPPINGS} (semicolon-separated;
+     *       entries beginning with {@code *.} contribute the extension part)</li>
+     *   <li>{@code .jspx} — always included for legacy JSP-XML views</li>
+     * </ul>
+     * Init parameters are read only on the first call; subsequent calls return the cached set.
+     */
+    private Set<String> getAllowedSuffixes(FacesContext context)
+    {
+        if (_allowedSuffixes == null)
+        {
+            ExternalContext ec = context.getExternalContext();
+
+            // Suffixes from jakarta.faces.FACELETS_SUFFIX (whitespace-separated, default ".xhtml")
+            String suffixParam = ec.getInitParameter(ViewHandler.FACELETS_SUFFIX_PARAM_NAME);
+            if (suffixParam == null)
+            {
+                suffixParam = ViewHandler.DEFAULT_FACELETS_SUFFIX;
+            }
+            Set<String> allowed = new HashSet<>(Arrays.asList(suffixParam.trim().split("\\s+")));
+
+            // Suffixes from jakarta.faces.FACELETS_VIEW_MAPPINGS (semicolon-separated; strip leading "*")
+            String mappingsParam = ec.getInitParameter(ViewHandler.FACELETS_VIEW_MAPPINGS_PARAM_NAME);
+            if (mappingsParam == null)
+            {
+                mappingsParam = ec.getInitParameter("facelets.VIEW_MAPPINGS");
+            }
+            if (mappingsParam != null)
+            {
+                for (String token : mappingsParam.split(";"))
+                {
+                    token = token.trim();
+                    if (token.startsWith("*."))
+                    {
+                        // suffix mapping e.g. "*.xhtml" -> ".xhtml"
+                        allowed.add(token.substring(1));
+                    }
+                    // Prefix mappings like "/faces/*" carry no extension — skipped.
+                }
+            }
+
+            // Legacy JSP-XML view support
+            allowed.add(".jspx");
+
+            _allowedSuffixes = allowed;
+        }
+        return _allowedSuffixes;
     }
 
     /**
