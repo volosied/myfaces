@@ -20,7 +20,6 @@ package org.apache.myfaces.view.facelets.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,6 +39,7 @@ import jakarta.faces.application.ViewHandler;
 import jakarta.faces.application.ViewResource;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
+import org.apache.myfaces.context.InvalidFileException;
 import jakarta.faces.view.facelets.Facelet;
 import jakarta.faces.view.facelets.FaceletCache;
 import jakarta.faces.view.facelets.FaceletCacheFactory;
@@ -274,7 +274,8 @@ public final class DefaultFaceletFactory extends FaceletFactory
         //        OSGi/container schemes (wsjar, jar, file, zip) are allowed and pass through.
         if (!isAllowedScheme(path))
         {
-            throw new MalformedURLException("Remote or disallowed scheme in path: " + path);
+            throw new InvalidFileException(InvalidFileException.Reason.DISALLOWED_SCHEME,
+                    "Remote or disallowed scheme in path: " + path);
         }
 
         URL resolved;
@@ -315,11 +316,13 @@ public final class DefaultFaceletFactory extends FaceletFactory
             {
                 log.fine("Path not allowed [" + path + "] -> resolved URL escapes application base");
             }
-            throw new MalformedURLException("Path escapes application base: " + path);
+            throw new InvalidFileException(InvalidFileException.Reason.PATH_TRAVERSAL,
+                    "Path escapes application base: " + path);
         }
 
         // --- 3. WEB-INF XML config files must not be directly served as Facelets.
-        // Note: .xml is not a facelet file unless specified via suffix / mapping parameters, so this check mark is disabled
+        //  check mark is disabled 
+        // Reason: .xml is not a facelet file unless specified via suffix / mapping parameters
         // if (isWebInfConfigFile(normalizedPath))
         // {
         //     if (log.isLoggable(Level.FINE))
@@ -336,7 +339,8 @@ public final class DefaultFaceletFactory extends FaceletFactory
             {
                 log.fine("Path not allowed [" + path + "] -> extension not a configured Facelet suffix");
             }
-            throw new MalformedURLException("Invalid path provided: " + path);
+            throw new InvalidFileException(InvalidFileException.Reason.INVALID_EXTENSION,
+                    "Invalid path provided: " + path);
         }
 
         return resolved;
